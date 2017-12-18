@@ -1,0 +1,50 @@
+[
+    {
+        "ParameterKey": "controllerip",
+        "ParameterValue": "198.12.45.123"
+    },
+    {
+        "ParameterKey": "username",
+        "ParameterValue": "admin"
+    },
+    {
+        "ParameterKey": "privateip",
+        "ParameterValue": "10.1.0.120"
+    },
+    {
+        "ParameterKey": "adminemail",
+        "ParameterValue": "test@emailserver.com"
+    },
+    {
+        "ParameterKey": "password",
+        "ParameterValue": "Compl1c4t#dP$sswOrd"
+    },
+    {
+        "ParameterKey": "Account",
+        "ParameterValue": "913325574578"
+    },
+    {
+        "ParameterKey": "AviatrixRoleApp",
+        "ParameterValue": "arn:aws:iam::913325574578:role/aviatrix-role-app"
+    },
+    {
+        "ParameterKey": "AviatrixRoleEC2",
+        "ParameterValue": "arn:aws:iam::913325574578:role/aviatrix-role-ec2"
+    },
+    {
+        "ParameterKey": "VPC",
+        "ParameterValue": "vpc-f940a381"
+    },
+    {
+        "ParameterKey": "SubnetParam",
+        "ParameterValue": "subnet-23350a79"
+    },
+    {
+        "ParameterKey": "SubnetParamHA",
+        "ParameterValue": "subnet-23350a79"
+    },
+    {
+        "ParameterKey": "GatewaySizeParam",
+        "ParameterValue": "t2.large"
+    }
+]

@@ -1,0 +1,38 @@
+[
+    {
+        "ParameterKey": "NewVPCCIDRParam",
+        "ParameterValue": "0.1.0.0/16"
+    },
+    {
+        "ParameterKey": "NewSubnetParam",
+        "ParameterValue": "10.1.0.0/24"
+    },
+    {
+        "ParameterKey": "NewSubnetParamHA",
+        "ParameterValue": "10.1.1.0/24"
+    },
+    {
+        "ParameterKey": "KeyNameParam",
+        "ParameterValue": "keypair.pem"
+    },
+    {
+        "ParameterKey": "AllowedSubnetsParam",
+        "ParameterValue": "0.0.0.0/0"
+    },
+    {
+        "ParameterKey": "adminemailParam",
+        "ParameterValue": "test@emailserver.com"
+    },
+    {
+        "ParameterKey": "passwordParam",
+        "ParameterValue": "Compl1c4t#dP$sswOrd"
+    },
+    {
+        "ParameterKey": "ControllerSizeParam",
+        "ParameterValue": "t2.large"
+    },
+    {
+        "ParameterKey": "GatewaySizeParam",
+        "ParameterValue": "t2.large"
+    }
+]

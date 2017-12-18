@@ -1,0 +1,38 @@
+[
+    {
+        "ParameterKey": "VPCParam",
+        "ParameterValue": "vpc-f940a381"
+    },
+    {
+        "ParameterKey": "SubnetParam",
+        "ParameterValue": "subnet-23350a79"
+    },
+    {
+        "ParameterKey": "SubnetParamHA",
+        "ParameterValue": "subnet-23350a79"
+    },
+    {
+        "ParameterKey": "KeyNameParam",
+        "ParameterValue": "keypair.pem"
+    },
+    {
+        "ParameterKey": "AllowedSubnetsParam",
+        "ParameterValue": "0.0.0.0/0"
+    },
+    {
+        "ParameterKey": "adminemailParam",
+        "ParameterValue": "test@emailserver.com"
+    },
+    {
+        "ParameterKey": "passwordParam",
+        "ParameterValue": "Compl1c4t#dP$sswOrd"
+    },
+    {
+        "ParameterKey": "ControllerSizeParam",
+        "ParameterValue": "t2.large"
+    },
+    {
+        "ParameterKey": "GatewaySizeParam",
+        "ParameterValue": "t2.large"
+    }
+]

@@ -1,0 +1,14 @@
+[
+    {
+        "ParameterKey": "NewVPCCIDRParam",
+        "ParameterValue": "0.1.0.0/16"
+    },
+    {
+        "ParameterKey": "NewSubnetParam",
+        "ParameterValue": "10.1.0.0/24"
+    },
+    {
+        "ParameterKey": "NewSubnetParamHA",
+        "ParameterValue": "10.1.1.0/24"
+    }
+]
