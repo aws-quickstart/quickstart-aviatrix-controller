@@ -17,7 +17,7 @@
     },
     {
         "ParameterKey": "password",
-        "ParameterValue": "Compl1c4t#dP$sswOrd"
+        "ParameterValue": "$[taskcat_genpass_8A]"
     },
     {
         "ParameterKey": "Account",
