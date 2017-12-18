@@ -1,0 +1,153 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Description" : "Aviatrix Systems - Launches Aviatrix Controller instance",
+  "Metadata" :
+  {
+    "AWS::CloudFormation::Interface" :
+    {
+      "ParameterGroups" :
+      [
+        { "Label" : { "default" : "Network Configuration" }, "Parameters" : [ "VPCParam", "SubnetParam" ] },
+        { "Label" : { "default" : "Amazon EC2 Configuration" }, "Parameters" : [ "KeyNameParam", "ControllerSizeParam"] },
+        { "Label" : { "default" : "Aviatrix Roles Configuration"}, "Parameters" : [ "AviatrixInstanceProfile" ] }
+      ],
+      "ParameterLabels" :
+      {
+         "VPCParam" : { "default" : "Which VPC should the Aviatrix Controller be deployed to?" },
+         "SubnetParam" : { "default" : "Which subnet within that VPC?" },
+         "KeyNameParam" : { "default" : "Which keypair will be used?" },
+         "AllowedSubnetsParam" : { "default" : "What is your management subnet?"},
+         "AviatrixInstanceProfile" : { "default": "If created by CF use: aviatrix-role-ec2" },
+         "ControllerSizeParam" : { "default" : "Instance Size for the Controller?"}
+      }
+    }
+  },
+  "Parameters":
+  {
+    "VPCParam": { "Type": "AWS::EC2::VPC::Id", "Description": "Select Your VPC" },
+    "SubnetParam": { "Type": "AWS::EC2::Subnet::Id", "Description": "Select Subnet" },
+    "KeyNameParam": { "Type": "AWS::EC2::KeyPair::KeyName", "Description": "(Required) Select your Keypair" },
+    "AllowedSubnetsParam": { "Type": "String", "Description": "(Optional) Management Subnets allowed to manage the controller (Default: 0.0.0.0/0)", "Default": "0.0.0.0/0" },
+    "AviatrixInstanceProfile" : { "Type":  "String", "Description": "(Required) Aviatrix Instance Profile", "Default": "aviatrix-role-ec2" },
+    "ControllerSizeParam":
+    {
+      "Type" : "String",
+      "Default" : "t2.large",
+      "AllowedValues" : ["t2.large", "m3.medium","m3.large","m3.xlarge","m4.large","m4.xlarge","c4.large","c4.xlarge"],
+      "Description" : "Select an instance size. Default is t2.large."
+    }
+  },
+  "Rules": {
+      "KeyPairsNotEmpty": {
+          "Assertions": [
+              {
+                  "Assert": {
+                      "Fn::Not": [
+                          {
+                              "Fn::EachMemberEquals": [
+                                  {
+                                      "Fn::RefAll": "AWS::EC2::KeyPair::KeyName"
+                                  },
+                                  ""
+                              ]
+                          }
+                      ]
+                  },
+                  "AssertDescription": "All key pair parameters must not be empty"
+              }
+          ]
+      },
+      "SubnetsInVPC": {
+          "Assertions": [
+              {
+                  "Assert": {
+                      "Fn::EachMemberIn": [
+                          {
+                              "Fn::ValueOfAll": [
+                                  "AWS::EC2::Subnet::Id",
+                                  "VpcId"
+                              ]
+                          },
+                          {
+                              "Fn::RefAll": "AWS::EC2::VPC::Id"
+                          }
+                      ]
+                  },
+                  "AssertDescription": "All subnets must in the VPC"
+              }
+          ]
+      }
+  },
+  "Mappings" :
+  {
+    "RegionMap" :
+    {
+      "us-east-1" : { "Name" : "ami-cc27a0b6" },
+      "us-east-2" : { "Name" : "ami-33476956" },
+      "us-west-1" : { "Name" : "ami-ee0a338e" },
+      "us-west-2" : { "Name" : "ami-d97aaba1"}
+    }
+  },
+  "Resources" :
+  {
+    "AviatrixController" :
+    {
+      "Type" : "AWS::EC2::Instance",
+      "Properties" :
+      {
+        "ImageId" : { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, "Name" ]},
+        "KeyName" : { "Ref": "KeyNameParam" },
+        "InstanceType": { "Ref" : "ControllerSizeParam" },
+        "IamInstanceProfile" : {"Ref":  "AviatrixInstanceProfile" },
+        "NetworkInterfaces":
+        [ {
+            "DeviceIndex": "0",
+            "GroupSet": [{ "Ref" : "AviatrixSG" }],
+            "SubnetId": { "Ref" : "SubnetParam" }
+        } ],
+        "Tags":
+        [
+          { "Key": "Name", "Value": "Aviatrix Controller" },
+          { "Key": "Project", "Value": "Aviatrix" },
+          { "Key": "CreatedUsing", "Value": "Aviatrix Quickstart" }
+        ]
+      }
+    },
+    "AviatrixEIP":
+    {
+      "Type": "AWS::EC2::EIP",
+      "Properties" : {
+        "InstanceId" : {"Ref":  "AviatrixController" }
+      }
+    },
+    "AviatrixSG":
+    {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties":
+      {
+        "GroupName": "AviatrixControllerSG",
+        "GroupDescription": "Aviatrix - Allow HTTPS to Controller",
+        "VpcId": { "Ref": "VPCParam" },
+        "SecurityGroupIngress":
+        [ {
+          "IpProtocol": "tcp",
+          "CidrIp": { "Ref": "AllowedSubnetsParam" },
+          "FromPort": "443",
+          "ToPort": "443"
+        } ],
+        "Tags":
+        [
+          { "Key": "Name", "Value": "Aviatrix Security Group" },
+          { "Key": "Project", "Value": "Aviatrix" },
+          { "Key": "CreatedUsing", "Value": "Aviatrix Quickstart" }
+        ]
+      }
+    }
+  },
+  "Outputs" :
+  {
+    "AccountId" : { "Description": "Amazon Account ID", "Value" : { "Ref" : "AWS::AccountId" } },
+    "AviatrixControllerEIP" : { "Description": "AviatrixController External IP", "Value" : { "Fn::GetAtt" : [ "AviatrixController" , "PublicIp" ] } },
+    "AviatrixControllerPrivateIP" : { "Description": "AviatrixController Private IP", "Value" : { "Fn::GetAtt" : [ "AviatrixController" , "PrivateIp" ] } }
+  }
+}
