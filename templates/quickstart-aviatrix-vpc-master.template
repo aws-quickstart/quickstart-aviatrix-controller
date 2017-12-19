@@ -150,7 +150,7 @@
         "Type": "AWS::CloudFormation::Stack",
         "Properties": {
           "TemplateURL": {
-            "Fn::Sub": "https://s3.amazonaws.com/quickstart-aviatrix-us-east-1/templates/quickstart-aviatrix-lamdba.template"
+            "Fn::Sub": "https://s3.amazonaws.com/quickstart-aviatrix-us-east-1/templates/quickstart-aviatrix-lambda.template"
           },
           "Parameters": {
               "controllerip" : {
