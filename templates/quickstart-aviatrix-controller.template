@@ -1,0 +1,175 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Description" : "Aviatrix Systems - Launches Aviatrix Controller instance",
+  "Metadata" :
+  {
+    "AWS::CloudFormation::Interface" :
+    {
+      "ParameterGroups" :
+      [
+        { "Label" : { "default" : "Network Configuration" }, "Parameters" : [ "VPCParam", "SubnetParam" ] },
+        { "Label" : { "default" : "Amazon EC2 Configuration" }, "Parameters" : [ "KeyNameParam", "ControllerSizeParam"] },
+        { "Label" : { "default" : "Aviatrix Roles Configuration"}, "Parameters" : [ "AviatrixInstanceProfile" ] },
+        { "Label" : { "default" : "Licensing Configuration"}, "Parameters" : [ "LicenseModel", "License" ] }
+      ],
+      "ParameterLabels" :
+      {
+         "VPCParam" : { "default" : "Which VPC should the Aviatrix Controller be deployed to?" },
+         "SubnetParam" : { "default" : "Which subnet within that VPC?" },
+         "KeyNameParam" : { "default" : "Which keypair will be used?" },
+         "AviatrixInstanceProfile" : { "default": "If created by CF use: aviatrix-role-ec2" },
+         "ControllerSizeParam" : { "default" : "Instance Size for the Controller?"},
+         "LicenseModel" : { "default" : "Licensing Model?:"},
+         "License" :  { "default" : "Enter your license key:"}
+      }
+    }
+  },
+  "Parameters":
+  {
+    "VPCParam": { "Type": "AWS::EC2::VPC::Id", "Description": "Select Your VPC" },
+    "SubnetParam": { "Type": "AWS::EC2::Subnet::Id", "Description": "Select Subnet" },
+    "KeyNameParam": { "Type": "AWS::EC2::KeyPair::KeyName", "Description": "(Required) Select your Keypair" },
+    "AviatrixInstanceProfile" : { "Type":  "String", "Description": "(Required) Aviatrix Instance Profile", "Default": "aviatrix-role-ec2" },
+    "ControllerSizeParam":
+    {
+      "Type" : "String",
+      "Default" : "t2.large",
+      "AllowedValues" : ["t2.large", "m3.medium","m3.large","m3.xlarge","m4.large","m4.xlarge","c4.large","c4.xlarge"],
+      "Description" : "Select an instance size. Default is t2.large."
+    },
+    "LicenseModel" : {
+      "Description" : "Choose between BYOL or Utility License models.",
+      "Type" : "String",
+      "Default" : "LicenseIncluded",
+      "AllowedValues" : [ "LicenseIncluded", "BYOL" ]
+    },
+    "License": {
+      "Description" : "(Required, only if using BYOL License Model) If you don't have one, please contact sales@aviatrix.com. For LicenseIncluded leave BLANK",
+      "Type" : "String"
+    }
+  },
+  "Rules": {
+      "KeyPairsNotEmpty": {
+          "Assertions": [
+              {
+                  "Assert": {
+                      "Fn::Not": [
+                          {
+                              "Fn::EachMemberEquals": [
+                                  {
+                                      "Fn::RefAll": "AWS::EC2::KeyPair::KeyName"
+                                  },
+                                  ""
+                              ]
+                          }
+                      ]
+                  },
+                  "AssertDescription": "All key pair parameters must not be empty"
+              }
+          ]
+      },
+      "SubnetsInVPC": {
+          "Assertions": [
+              {
+                  "Assert": {
+                      "Fn::EachMemberIn": [
+                          {
+                              "Fn::ValueOfAll": [
+                                  "AWS::EC2::Subnet::Id",
+                                  "VpcId"
+                              ]
+                          },
+                          {
+                              "Fn::RefAll": "AWS::EC2::VPC::Id"
+                          }
+                      ]
+                  },
+                  "AssertDescription": "All subnets must in the VPC"
+              }
+          ]
+      }
+  },
+  "Mappings" :
+  {
+    "RegionMap" :
+    {
+      "us-east-1" : { "LicenseIncluded" : "ami-cc27a0b6",  "BYOL": "ami-cc27a0b6" },
+      "us-east-2" : { "LicenseIncluded" : "ami-4ddbf328",  "BYOL": "ami-4ddbf328" },
+      "us-west-1" : { "LicenseIncluded" : "ami-c89d9aa8",  "BYOL": "ami-c89d9aa8" },
+      "us-west-2" : { "LicenseIncluded" : "ami-c87fd2b0",  "BYOL": "ami-c87fd2b0" },
+      "sa-east-1" : { "LicenseIncluded" : "ami-ddbbfab1",  "BYOL": "ami-ddbbfab1" },
+      "eu-west-1" : { "LicenseIncluded" : "ami-1e38ba67",  "BYOL": "ami-1e38ba67" },
+      "eu-west-2" : { "LicenseIncluded" : "ami-cdeef7a9",  "BYOL": "ami-cdeef7a9" },
+      "eu-west-3" : { "LicenseIncluded" : "ami-7b3c8b06",  "BYOL": "ami-7b3c8b06" },
+      "eu-central-1" : { "LicenseIncluded" : "ami-5c811533",  "BYOL": "ami-5c811533" },
+      "ca-central-1" : { "LicenseIncluded" : "ami-ac5ce6c8",  "BYOL": "ami-ac5ce6c8" },
+      "ap-northeast-1" : { "LicenseIncluded" : "ami-9b5dd6fd",  "BYOL": "ami-9b5dd6fd" },
+      "ap-northeast-2" : { "LicenseIncluded" : "ami-38b11056",  "BYOL": "ami-38b11056" },
+      "ap-southeast-1" : { "LicenseIncluded" : "ami-966f9ef4",  "BYOL": "ami-966f9ef4" },
+      "ap-southeast-1" : { "LicenseIncluded" : "ami-91fa95ed",  "BYOL": "ami-91fa95ed" },
+      "ap-south-1" : { "LicenseIncluded" : "ami-f12e649e",  "BYOL": "ami-f12e649e" }
+    }
+  },
+  "Resources" :
+  {
+    "AviatrixController" :
+    {
+      "Type" : "AWS::EC2::Instance",
+      "Properties" :
+      {
+        "ImageId" : { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, { "Ref": "LicenseModel" } ] },
+        "KeyName" : { "Ref": "KeyNameParam" },
+        "InstanceType": { "Ref" : "ControllerSizeParam" },
+        "IamInstanceProfile" : {"Ref":  "AviatrixInstanceProfile" },
+        "NetworkInterfaces":
+        [ {
+            "DeviceIndex": "0",
+            "GroupSet": [{ "Ref" : "AviatrixSG" }],
+            "SubnetId": { "Ref" : "SubnetParam" }
+        } ],
+        "Tags":
+        [
+          { "Key": "Name", "Value": "Aviatrix Controller" },
+          { "Key": "Project", "Value": "Aviatrix" },
+          { "Key": "CreatedUsing", "Value": "Aviatrix Quickstart" }
+        ]
+      }
+    },
+    "AviatrixEIP":
+    {
+      "Type": "AWS::EC2::EIP",
+      "Properties" : {
+        "InstanceId" : {"Ref":  "AviatrixController" }
+      }
+    },
+    "AviatrixSG":
+    {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties":
+      {
+        "GroupName": "AviatrixControllerSG",
+        "GroupDescription": "Aviatrix - Allow HTTPS to Controller",
+        "VpcId": { "Ref": "VPCParam" },
+        "SecurityGroupIngress":
+        [ {
+          "IpProtocol": "tcp",
+          "CidrIp": "0.0.0.0/0",
+          "FromPort": "443",
+          "ToPort": "443"
+        } ],
+        "Tags":
+        [
+          { "Key": "Name", "Value": "Aviatrix Security Group" },
+          { "Key": "Project", "Value": "Aviatrix" },
+          { "Key": "CreatedUsing", "Value": "Aviatrix Quickstart" }
+        ]
+      }
+    }
+  },
+  "Outputs" :
+  {
+    "AccountId" : { "Description": "Amazon Account ID", "Value" : { "Ref" : "AWS::AccountId" } },
+    "AviatrixControllerEIP" : { "Description": "AviatrixController External IP", "Value" : { "Fn::GetAtt" : [ "AviatrixController" , "PublicIp" ] } },
+    "AviatrixControllerPrivateIP" : { "Description": "AviatrixController Private IP", "Value" : { "Fn::GetAtt" : [ "AviatrixController" , "PrivateIp" ] } }
+  }
+}
