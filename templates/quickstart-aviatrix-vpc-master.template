@@ -7,22 +7,32 @@
     {
       "ParameterGroups" :
       [
-        { "Label" : { "default": "Amazon EC2 Configuration" }, "Parameters" : [ "KeyNameParam", "AllowedSubnetsParam" ] },
-        { "Label" : { "default" : "VPC Configuration"}, "Parameters" : [ "NewVPCCIDRParam", "NewSubnetParam", "NewSubnetParamHA" ] },
+        { "Label" : { "default": "Amazon EC2 Configuration" }, "Parameters" : [ "KeyNameParam" ] },
+        { "Label" : { "default" : "VPC Configuration"}, "Parameters" : [ "NewVPCCIDRParam", "NewSubnetParam", "NewAZParam", "NewSubnetParamHA", "NewAZParamHA" ] },
         { "Label" : { "default" : "Controller Information" }, "Parameters" : [ "adminemailParam", "passwordParam", "ControllerSizeParam" ] },
-        { "Label" : { "default" : "Gateway Information" }, "Parameters" : [ "GatewaySizeParam" ] }
+        { "Label" : { "default" : "Licensing Configuration"}, "Parameters" : [ "LicenseModel", "License" ] },
+        { "Label" : { "default" : "Gateway Information" }, "Parameters" : [ "HubGWSizeParam", "SpokeGWSizeParam", "SpokeTag"] },
+        { "Label" : { "default" : "IAM Roles Information" }, "Parameters" : [ "OtherAccount", "OtherAccountRoleApp", "OtherAccountRoleEC2"] }
       ],
       "ParameterLabels" :
       {
          "NewVPCCIDRParam" : { "default" : "VPC's CIDR Block?"},
          "NewSubnetParam" : { "default" : "Subnet CIDR Block?"},
          "NewSubnetParamHA" : { "default" : "Subnet CIDR Block for HA?"},
+         "NewAZParam" : { "default": "Availability zone" },
+         "NewAZParamHA" : { "default": "Availability zone for HA"},
          "KeyNameParam" : { "default" : "Which keypair will be used?" },
-         "AllowedSubnetsParam" : { "default" : "What is your management subnet?"},
          "adminemailParam" : { "default" : "Administrator email address?"},
-         "passwordParam" : { "default" : "Password for admin on Controller? (Complex Password)" },
-         "ControllerSizeParam" : { "default" : "Instance Size for the Controller?"},
-         "GatewaySizeParam" : { "default" : "Instance Size for the Hub Gateway?" }
+         "passwordParam" : { "default" : "Password for admin on Aviatrix Controller? " },
+         "ControllerSizeParam" : { "default" : "Instance Size for the Aviatrix Controller?"},
+         "HubGWSizeParam" : { "default" : "Instance Size for the Aviatrix Hub Gateway?" },
+         "SpokeGWSizeParam" : { "default" : "Instance Size for the Aviatrix Spoke Gateways?" },
+         "SpokeTag" : { "default" : "Spoke VPC Tag Name" },
+         "OtherAccount" : { "default" : "Second Account number"},
+         "OtherAccountRoleApp" : { "default" : "ARN for Aviatrix-role-app on secondary account"},
+         "OtherAccountRoleEC2" : { "default" : "ARN for aviatrix-role-ec2 on secondary account"},
+         "LicenseModel" : { "default" : "Licensing Model?:"},
+         "License" :  { "default" : "Enter your license key:"}
        }
     }
   },
@@ -49,13 +59,15 @@
       "Description" : "(Required) Subnet for the HA Hub Gateway (Default: 10.1.1.0/24)",
       "Default": "10.1.1.0/24"
     },
+    "NewAZParam":{
+      "Type": "AWS::EC2::AvailabilityZone::Name"
+    },
+    "NewAZParamHA":{
+      "Type": "AWS::EC2::AvailabilityZone::Name"
+    },
     "KeyNameParam": {
       "Type": "AWS::EC2::KeyPair::KeyName",
       "Description": "(Required) Select your Keypair"
-    },
-    "AllowedSubnetsParam": {
-      "Type": "String", "Description": "(Required) Management networks that will be allowed access the controller (Default: 0.0.0.0/0)",
-      "Default": "0.0.0.0/0"
     },
     "adminemailParam": {
       "Type": "String",
@@ -63,27 +75,67 @@
     },
     "passwordParam": {
       "Type": "String",
-      "Description": "(Required) Password for the controller",
+      "Description": "(Required) Password for the controller. Please use a complex password.",
       "NoEcho": true
     },
     "ControllerSizeParam":
     {
       "Type" : "String",
       "Default" : "t2.large",
-      "AllowedValues" : ["t2.small", "t2.medium", "t2.large", "m3.medium","m3.large","m3.xlarge","m4.large","m4.xlarge","c4.large","c4.xlarge"],
+      "AllowedValues" : ["t2.large", "m3.medium","m3.large","m3.xlarge","m4.large","m4.xlarge","c4.large","c4.xlarge"],
       "Description" : "Select an instance size. Default is t2.large."
     },
-    "GatewaySizeParam":
+    "HubGWSizeParam":
+    {
+      "Type" : "String",
+      "Default" : "t2.medium",
+      "AllowedValues" : ["t2.nano", "t2.micro", "t2.small", "t2.medium", "t2.large", "m3.medium","m3.large","m3.xlarge","m4.large","m4.xlarge","c4.large","c4.xlarge"],
+      "Description" : "Select an instance size. Default is t2.medium."
+    },
+    "SpokeGWSizeParam":
     {
       "Type" : "String",
       "Default" : "t2.micro",
       "AllowedValues" : ["t2.nano", "t2.micro", "t2.small", "t2.medium", "t2.large", "m3.medium","m3.large","m3.xlarge","m4.large","m4.xlarge","c4.large","c4.xlarge"],
       "Description" : "Select an instance size. Default is t2.micro."
+    },
+    "SpokeTag" :{
+      "Type" : "String",
+      "Default" : "aviatrix-spoke",
+      "Description" : "Tag to be used to identify spoke VPCs to connect to Transit VPC. Default is aviatrix-spoke."
+    },
+     "OtherAccount" : {
+        "Type" : "String",
+        "Default" : "",
+        "Description" : "(Optional) Enter the number of the secondary AWS account where spokes will be deployed."
+     },
+     "OtherAccountRoleApp" : {
+       "Type" : "String",
+       "Default" : "",
+       "Description" : "(Optional) Enter the ARN of the aviatrix-role-app on the secondary account where spokes will be deployed."
+    },
+    "OtherAccountRoleEC2" : {
+       "Type" : "String",
+       "Default" : "",
+       "Description" : "(Optional) Enter the ARN of the Aviatrix-role-ec2 on the secondary account where spokes will be deployed."
+    },
+    "LicenseModel" : {
+      "Description" : "Choose between BYOL or License Included - licensing models.",
+      "Type" : "String",
+      "Default" : "LicenseIncluded",
+      "AllowedValues" : [ "LicenseIncluded", "BYOL" ]
+    },
+    "License": {
+      "Description" : "(Required, only if using BYOL License Model) If you don't have one, please contact sales@aviatrix.com. For LicenseIncluded leave BLANK",
+      "Type" : "String"
     }
+  },
+  "Conditions" : {
+    "NotBlankLicense" : { "Fn::Not" : [ { "Fn::Equals": [ { "Ref": "License" }, "" ] } ] }
   },
   "Resources" :
   {
-    "AviatrixVPCStack": {
+    "AVXVPCStack": {
       "Type": "AWS::CloudFormation::Stack",
       "Properties": {
           "TemplateURL": {
@@ -98,11 +150,17 @@
             },
             "NewSubnetParamHA": {
               "Ref": "NewSubnetParamHA"
+            },
+            "NewAZParam": {
+              "Ref": "NewAZParam"
+            },
+            "NewAZParamHA": {
+              "Ref": "NewAZParamHA"
             }
           }
       }
     },
-    "AviatrixIAMRolesStack": {
+    "AVXIAMRolesStack": {
       "Type": "AWS::CloudFormation::Stack",
       "Properties": {
           "TemplateURL": {
@@ -113,8 +171,8 @@
           }
       }
     },
-    "AviatrixControllerStack": {
-        "DependsOn": "AviatrixIAMRolesStack",
+    "AVXControllerStack": {
+        "DependsOn": "AVXIAMRolesStack",
         "Type": "AWS::CloudFormation::Stack",
         "Properties": {
           "TemplateURL": {
@@ -123,30 +181,39 @@
           "Parameters": {
               "VPCParam" : {
                 "Fn::GetAtt": [
-                  "AviatrixVPCStack",
+                  "AVXVPCStack",
                   "Outputs.VPCID"
                 ]
               },
               "SubnetParam" : {
                 "Fn::GetAtt": [
-                  "AviatrixVPCStack",
+                  "AVXVPCStack",
                   "Outputs.SubnetID"
                 ]
+              },
+              "ControllerSizeParam" : {
+                "Ref": "ControllerSizeParam"
               },
               "KeyNameParam" : {
                 "Ref": "KeyNameParam"
               },
+              "LicenseModel" : {
+                "Ref": "LicenseModel"
+              },
+              "License" : {
+                "Ref": "License"
+              },
               "AviatrixInstanceProfile" : {
                 "Fn::GetAtt": [
-                    "AviatrixIAMRolesStack",
+                    "AVXIAMRolesStack",
                     "Outputs.AviatrixInstanceProfile"
                 ]
               }
           }
         }
     },
-    "AviatrixLambdaStack": {
-        "DependsOn": "AviatrixControllerStack",
+    "AVXLambdaStack": {
+        "DependsOn": "AVXControllerStack",
         "Type": "AWS::CloudFormation::Stack",
         "Properties": {
           "TemplateURL": {
@@ -155,14 +222,14 @@
           "Parameters": {
               "controllerip" : {
                 "Fn::GetAtt": [
-                    "AviatrixControllerStack",
+                    "AVXControllerStack",
                     "Outputs.AviatrixControllerEIP"
                 ]
               },
               "username" : "admin",
               "privateip" : {
                 "Fn::GetAtt": [
-                    "AviatrixControllerStack",
+                    "AVXControllerStack",
                     "Outputs.AviatrixControllerPrivateIP"
                 ]
               },
@@ -174,39 +241,64 @@
               },
               "AviatrixRoleApp" : {
                 "Fn::GetAtt": [
-                    "AviatrixIAMRolesStack",
+                    "AVXIAMRolesStack",
                     "Outputs.AviatrixRoleAppARN"
                 ]
               },
               "AviatrixRoleEC2" : {
                 "Fn::GetAtt": [
-                    "AviatrixIAMRolesStack",
+                    "AVXIAMRolesStack",
                     "Outputs.AviatrixRoleEC2ARN"
                 ]
               },
               "Account" : {
                 "Fn::GetAtt": [
-                    "AviatrixIAMRolesStack",
+                    "AVXIAMRolesStack",
                     "Outputs.AccountId"
                 ]
               },
               "VPC" : {
                 "Fn::GetAtt": [
-                  "AviatrixVPCStack",
+                  "AVXVPCStack",
                   "Outputs.VPCID"
                 ]
               },
               "SubnetParam" : {
                 "Fn::GetAtt": [
-                  "AviatrixVPCStack",
+                  "AVXVPCStack",
                   "Outputs.SubnetCIDR"
                 ]
               },
               "SubnetParamHA" : {
                 "Fn::GetAtt": [
-                  "AviatrixVPCStack",
+                  "AVXVPCStack",
                   "Outputs.SubnetCIDRHA"
                 ]
+              },
+              "HubGWSizeParam": {
+          			"Ref": "HubGWSizeParam"
+          		},
+          		"SpokeGWSizeParam":
+              {
+                "Ref": "SpokeGWSizeParam"
+              },
+              "SpokeTag": {
+                "Ref": "SpokeTag"
+              },
+              "OtherAccount": {
+                "Ref": "OtherAccount"
+              },
+              "OtherAccountRoleApp": {
+                "Ref": "OtherAccountRoleApp"
+              },
+              "OtherAccountRoleEC2": {
+                "Ref": "OtherAccountRoleEC2"
+              },
+              "LicenseModel" : {
+                "Ref": "LicenseModel"
+              },
+              "License" : {
+                "Fn::If" : [ "NotBlankLicense", { "Ref": "License" }, "" ]
               }
             }
           }
@@ -214,10 +306,10 @@
   },
   "Outputs" :
   {
-    "AccountId" : { "Description": "Amazon Account ID", "Value" : { "Fn::GetAtt" : [ "AviatrixIAMRolesStack", "Outputs.AccountId" ] } },
-    "AviatrixRoleAppARN" : { "Description": "AviatrixRoleApp ARN", "Value" : { "Fn::GetAtt" : [ "AviatrixIAMRolesStack", "Outputs.AviatrixRoleAppARN" ] } },
-    "AviatrixRoleEC2ARN" : { "Description": "AviatrixRoleEC2 ARN", "Value" : { "Fn::GetAtt" : [ "AviatrixIAMRolesStack", "Outputs.AviatrixRoleEC2ARN" ] } },
-    "AviatrixControllerEIP" : { "Description": "AviatrixController External IP", "Value" : { "Fn::GetAtt" : [ "AviatrixControllerStack", "Outputs.AviatrixControllerEIP" ] } },
-    "AviatrixControllerPrivateIP" : { "Description": "AviatrixController Private IP", "Value" : { "Fn::GetAtt" : [ "AviatrixControllerStack", "Outputs.AviatrixControllerPrivateIP" ] } }
+    "AccountId" : { "Description": "Amazon Account ID", "Value" : { "Fn::GetAtt" : [ "AVXIAMRolesStack", "Outputs.AccountId" ] } },
+    "AviatrixRoleAppARN" : { "Description": "AviatrixRoleApp ARN", "Value" : { "Fn::GetAtt" : [ "AVXIAMRolesStack", "Outputs.AviatrixRoleAppARN" ] } },
+    "AviatrixRoleEC2ARN" : { "Description": "AviatrixRoleEC2 ARN", "Value" : { "Fn::GetAtt" : [ "AVXIAMRolesStack", "Outputs.AviatrixRoleEC2ARN" ] } },
+    "AviatrixControllerEIP" : { "Description": "AviatrixController External IP", "Value" : { "Fn::GetAtt" : [ "AVXControllerStack", "Outputs.AviatrixControllerEIP" ] } },
+    "AviatrixControllerPrivateIP" : { "Description": "AviatrixController Private IP", "Value" : { "Fn::GetAtt" : [ "AVXControllerStack", "Outputs.AviatrixControllerPrivateIP" ] } }
   }
 }

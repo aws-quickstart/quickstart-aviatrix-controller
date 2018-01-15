@@ -3,15 +3,6 @@ global:
   owner: quickstart-eng@amazon.com
   qsname: quickstart-aviatrix
   regions:
-    - ap-northeast-1
-    - ap-northeast-2
-    - ap-south-1
-    - ap-southeast-1
-    - ap-southeast-2
-    - ca-central-1
-    - eu-central-1
-    - eu-west-1
-    - sa-east-1
     - us-east-1
     - us-east-2
     - us-west-1
@@ -19,21 +10,21 @@ global:
   reporting: true
 
 tests:
-  quickstart-aviatrixt-vpc:
+  quickstart-aviatrix-vpc:
     parameter_input: quickstart-aviatrix-vpc-params.json
     template_file: quickstart-aviatrix-vpc.template
-  quickstart-aviatrixt-iamroles:
-    parameter_input: quickstart-aviatrix-iamroles-params.json
-    template_file: quickstart-aviatrix-iamroles.template
-  quickstart-aviatrixt-controller:
-    parameter_input: quickstart-aviatrix-controller-params.json
-    template_file: quickstart-aviatrix-controller.template
-  quickstart-aviatrixt-lambda:
-    parameter_input: quickstart-aviatrix-lambda-params.json
-    template_file: quickstart-aviatrix-lambda.template
-  quickstart-aviatrixt-novpc-master:
-    parameter_input: quickstart-aviatrix-novpc-master-params.json
-    template_file: quickstart-aviatrix-novpc-master.template
-  quickstart-aviatrixt-vpc-master:
-    parameter_input: quickstart-aviatrix-vpc-master-params.json
-    template_file: quickstart-aviatrix-vpc-master.template
+  # quickstart-aviatrixt-iamroles:
+  #   parameter_input: quickstart-aviatrix-iamroles-params.json
+  #   template_file: quickstart-aviatrix-iamroles.template
+  # quickstart-aviatrixt-controller:
+  #   parameter_input: quickstart-aviatrix-controller-params.json
+  #   template_file: quickstart-aviatrix-controller.template
+  # quickstart-aviatrixt-lambda:
+  #   parameter_input: quickstart-aviatrix-lambda-params.json
+  #   template_file: quickstart-aviatrix-lambda.template
+  # quickstart-aviatrixt-novpc-master:
+  #   parameter_input: quickstart-aviatrix-novpc-master-params.json
+  #   template_file: quickstart-aviatrix-novpc-master.template
+  # quickstart-aviatrixt-vpc-master:
+  #   parameter_input: quickstart-aviatrix-vpc-master-params.json
+  #   template_file: quickstart-aviatrix-vpc-master.template

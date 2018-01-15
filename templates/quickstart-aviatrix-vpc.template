@@ -8,13 +8,15 @@
       "ParameterGroups" :
       [
         { "Label" : { "default" : "VPC Configuration"},
-          "Parameters" : [ "NewVPCCIDRParam", "NewSubnetParam", "NewSubnetParamHA" ] }
+          "Parameters" : [ "NewVPCCIDRParam", "NewSubnetParam", "NewAZParam", "NewSubnetParamHA", "NewAZParamHA" ] }
       ],
       "ParameterLabels" :
       {
          "NewVPCCIDRParam" : { "default" : "VPC subnet?"},
          "NewSubnetParam" : { "default" : "Subnet?"},
-         "NewSubnetParamHA" : { "default" : "Subnet for HA?"}
+         "NewSubnetParamHA" : { "default" : "Subnet for HA?"},
+         "NewAZParam" : { "default": "Availability zone" },
+         "NewAZParamHA" : { "default": "Availability zone for HA"}
       }
     }
   },
@@ -40,6 +42,12 @@
       "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
       "Description" : "(Required) Subnet for the controller (Default: 10.1.1.0/24)",
       "Default": "10.1.1.0/24"
+    },
+    "NewAZParam":{
+      "Type": "AWS::EC2::AvailabilityZone::Name"
+    },
+    "NewAZParamHA":{
+      "Type": "AWS::EC2::AvailabilityZone::Name"
     }
   },
   "Resources": {
@@ -85,7 +93,7 @@
       "PublicSubnet": {
           "Type": "AWS::EC2::Subnet",
           "Properties": {
-              "AvailabilityZone": { "Fn::Join" : [ "", [ { "Ref" : "AWS::Region" }, "a" ] ] },
+              "AvailabilityZone": { "Ref" : "NewAZParam" },
               "VpcId": {
                   "Ref": "VPC"
               },
@@ -103,7 +111,7 @@
       "PublicSubnetHA": {
           "Type": "AWS::EC2::Subnet",
           "Properties": {
-              "AvailabilityZone": { "Fn::Join" : [ "", [ { "Ref" : "AWS::Region" }, "b" ] ] },
+              "AvailabilityZone": { "Ref" : "NewAZParamHA" },
               "VpcId": {
                   "Ref": "VPC"
               },

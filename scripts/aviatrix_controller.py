@@ -3,14 +3,29 @@ import boto3
 import json
 import logging
 from urllib2 import Request, urlopen, URLError
+import urllib
 #Needed to load Aviatrix Python API.
 from aviatrix import Aviatrix
 #Needed for Lambda Custom call
 import cfnresponse
+import time
 
 #logging configuration
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+
+USAGE_URL = "http://127.0.0.1:5001"
+USAGE_DATA = { 'launchtime': time.time(),
+               'accountid':  boto3.client('sts').get_caller_identity().get('Account') }
+
+def send_usage_info(url,data):
+    # sending POST request
+    try:
+        parameters = urllib.urlencode(data)
+        response = urlopen(url, data=parameters)
+        return "Usage Data sent"
+    except URLError:
+        return "Couldn't send out Usage Data"
 
 def create_handler(event,context):
     #Read environment Variables
@@ -26,9 +41,14 @@ def create_handler(event,context):
     subnet_hub = os.environ.get("SubnetParam")
     subnet_hubHA = os.environ.get("SubnetParamHA")
     region_hub = os.environ.get("Region")
-    gwsize_hub = os.environ.get("GatewaySizeParam")
+    gwsize_hub = os.environ.get("HubGWSizeParam")
     gateway_queue = os.environ.get("GatewayQueue")
     gatewaytopic = os.environ.get("GatewayTopic")
+    licensemodel = os.environ.get("LicenseModel")
+    license = os.environ.get("License")
+    otheraccount = os.environ.get("OtherAccount")
+    otheraccountroleapp = os.environ.get("OtherAccountRoleApp")
+    otheraccountroleec2 = os.environ.get("OtherAccountRoleEC2")
 
     #Start the Controller Initialization process
     try:
@@ -49,6 +69,12 @@ def create_handler(event,context):
     try:
         controller = Aviatrix(controller_ip)
         controller.login(username,password)
+        logger.info('Done with Initial Controller Setup')
+        if licensemodel == "BYOL":
+            logger.info('Setting up License ')
+            controller.setup_customer_id(license)
+            logger.info('Done with License Setup')
+        logger.info('Setting up AWS Account')
         controller.setup_account_profile("AWSAccount",
                                          password,
                                          admin_email,
@@ -56,6 +82,19 @@ def create_handler(event,context):
                                          account,
                                          aviatrixroleapp,
                                          aviatrixroleec2)
+        logger.info('Done with Setting up AWS account')
+        if otheraccountroleapp:
+            if otheraccountroleec2:
+                logger.info('Setting up AWS Other Account')
+                controller.setup_account_profile("AWSOtherAccount",
+                                                 password,
+                                                 admin_email,
+                                                 "1",
+                                                 otheraccount,
+                                                 otheraccountroleapp,
+                                                 otheraccountroleec2)
+                logger.info('Done with Setting up AWS account')
+
         logger.info('Done with Account creation')
     except URLError, e:
         logger.info('Failed request. Error: %s', controller.results)
@@ -83,6 +122,8 @@ def create_handler(event,context):
         Subject='Create Hub Gateway',
         Message=json.dumps(message)
     )
+    usage_response = send_usage_info(USAGE_URL,USAGE_DATA)
+    logger.info('Usage Data Response: %s' % (usage_response))
     responseData = {
         "PhysicalResourceId": "arn:aws:fake:myID"
     }
@@ -102,7 +143,7 @@ def delete_handler(event, context):
     subnet_hub = os.environ.get("SubnetParam")
     subnet_hubHA = os.environ.get("SubnetParamHA")
     region_hub = os.environ.get("Region")
-    gwsize_hub = os.environ.get("GatewaySizeParam")
+    gwsize_hub = os.environ.get("HubGWSizeParam")
     gateway_queue = os.environ.get("GatewayQueue")
     gatewaytopic = os.environ.get("GatewayTopic")
     #Delete all tunnels and gateways

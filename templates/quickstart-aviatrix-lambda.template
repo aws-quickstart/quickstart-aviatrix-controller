@@ -7,7 +7,7 @@
 				"Label": {
 					"default": "Lambda Required Parameters"
 				},
-				"Parameters": ["controllerip", "username", "privateip", "adminemail", "password", "Account", "AviatrixRoleApp", "AviatrixRoleEC2", "VPC", "SubnetParam", "SubnetParamHA", "GatewaySizeParam"]
+				"Parameters": ["controllerip", "username", "privateip", "adminemail", "password", "Account", "AviatrixRoleApp", "AviatrixRoleEC2", "VPC", "SubnetParam", "SubnetParamHA", "HubGWSizeParam"]
 			}]
 		}
 	},
@@ -62,11 +62,49 @@
 			"Description": "Subnet for the controller (Default: 10.1.1.0/24)",
 			"Default": "10.1.1.0/24"
 		},
-		"GatewaySizeParam": {
-			"Type": "String",
-			"Default": "t2.small",
-			"AllowedValues": ["t2.small", "t2.large", "m3.medium", "m3.large", "m3.xlarge", "m4.large", "m4.xlarge", "c4.large", "c4.xlarge"],
-			"Description": "Select an instance size. Default is t2.small."
+		"HubGWSizeParam":
+    {
+      "Type" : "String",
+      "Default" : "t2.medium",
+      "AllowedValues" : ["t2.nano", "t2.micro", "t2.small", "t2.medium", "t2.large", "m3.medium","m3.large","m3.xlarge","m4.large","m4.xlarge","c4.large","c4.xlarge"],
+      "Description" : "Select an instance size. Default is t2.medium."
+    },
+    "SpokeGWSizeParam":
+    {
+      "Type" : "String",
+      "Default" : "t2.micro",
+      "AllowedValues" : ["t2.nano", "t2.micro", "t2.small", "t2.medium", "t2.large", "m3.medium","m3.large","m3.xlarge","m4.large","m4.xlarge","c4.large","c4.xlarge"],
+      "Description" : "Select an instance size. Default is t2.micro."
+    },
+		"SpokeTag" :{
+			"Type" : "String",
+			"Default" : "aviatrix-spoke",
+			"Description" : "Tag to be used to identify spoke VPCs to connect to Transit VPC. Default is aviatrix-spoke."
+		},
+		"OtherAccount" : {
+       "Type" : "String",
+       "Default" : "",
+       "Description" : "(Optional) Enter the number of the secondary AWS account where spokes will be deployed."
+    },
+		"OtherAccountRoleApp" : {
+      "Type" : "String",
+      "Default" : "",
+      "Description" : "(Optional) Enter the ARN of secondary account where spokes will be deployed."
+    },
+		"OtherAccountRoleEC2" : {
+       "Type" : "String",
+       "Default" : "",
+       "Description" : "(Optional) Enter the ARN of the Aviatrix-role-ec2 on the secondary account where spokes will be deployed."
+    },
+		"LicenseModel" : {
+			"Description" : "Choose between BYOL or Utility License models.",
+			"Type" : "String",
+			"Default" : "LicenseIncluded",
+			"AllowedValues" : ["LicenseIncluded", "BYOL"]
+		},
+		"License": {
+			"Description" : "(Required, only if using BYOL License Model) If you don't have one, please contact sales@aviatrix.com. For LicenseIncluded leave BLANK",
+			"Type" : "String"
 		}
 	},
 	"Resources": {
@@ -107,7 +145,8 @@
 							"ec2:Describe*",
 							"ec2:CreateTags",
 							"SQS:*",
-							"SNS:*"
+							"SNS:*",
+							"STS:AssumeRole"
 						],
 						"Resource": "*"
 					}]
@@ -229,8 +268,11 @@
 						"Region": {
 							"Ref": "AWS::Region"
 						},
-						"GatewaySizeParam": {
-							"Ref": "GatewaySizeParam"
+						"HubGWSizeParam": {
+							"Ref": "HubGWSizeParam"
+						},
+						"SpokeGWSizeParam": {
+							"Ref": "SpokeGWSizeParam"
 						},
 						"GatewayQueue": {
 							"Fn::GetAtt": ["AviatrixGWQueue", "QueueName"]
@@ -240,6 +282,21 @@
 						},
 						"GatewayTopic": {
 							"Ref": "AviatrixGWTopic"
+						},
+						"OtherAccount": {
+							"Ref": "OtherAccount"
+						},
+						"OtherAccountRoleApp": {
+							"Ref": "OtherAccountRoleApp"
+						},
+						"OtherAccountRoleEC2": {
+							"Ref": "OtherAccountRoleEC2"
+						},
+						"LicenseModel" : {
+							"Ref": "LicenseModel"
+						},
+						"License" : {
+							"Ref": "License"
 						}
 					}
 				},
@@ -293,8 +350,17 @@
 						"Region": {
 							"Ref": "AWS::Region"
 						},
-						"GatewaySizeParam": {
-							"Ref": "GatewaySizeParam"
+						"HubGWSizeParam": {
+							"Ref": "HubGWSizeParam"
+						},
+						"SpokeGWSizeParam": {
+							"Ref": "SpokeGWSizeParam"
+						},
+						"SpokeTag": {
+							"Ref": "SpokeTag"
+						},
+						"OtherAccountRoleApp": {
+							"Ref": "OtherAccountRoleApp"
 						},
 						"GatewayQueue": {
 							"Fn::GetAtt": ["AviatrixGWQueue", "QueueName"]
@@ -320,7 +386,7 @@
 				"TopicName": "AviatrixGatewayTopic"
 			}
 		},
-		"InvokeGWLambdaPermission": {
+		"InvokeGWLambda": {
 			"Type": "AWS::Lambda::Permission",
 			"Properties": {
 				"Action": "lambda:InvokeFunction",
@@ -333,7 +399,7 @@
 				}
 			}
 		},
-		"AviatrixPollerSQSLambda": {
+		"AviatrixPollerLambda": {
 			"Type": "AWS::Lambda::Function",
 			"Properties": {
 				"Handler": "aviatrix_poller.handler",
@@ -362,6 +428,15 @@
 						"HubVPC": {
 							"Ref": "VPC"
 						},
+						"SpokeGWSizeParam": {
+							"Ref": "SpokeGWSizeParam"
+						},
+						"SpokeTag": {
+							"Ref": "SpokeTag"
+						},
+						"OtherAccountRoleApp": {
+							"Ref": "OtherAccountRoleApp"
+						},
 						"GatewayTopic": {
 							"Ref": "AviatrixGWTopic"
 						}
@@ -374,26 +449,26 @@
 		"AviatrixPollerEvent": {
 			"Type": "AWS::Events::Rule",
 			"Properties": {
-				"Description": "Rule to trigger AviatrixPoller every 1 minutes to find VPCs that need to be attached to the Transit Hub VPC.",
-				"ScheduleExpression": "cron(* * * * ? *)",
+				"Description": "Rule to trigger AviatrixPoller every 2 minutes to find VPCs that need to be attached to the Transit Hub VPC.",
+				"ScheduleExpression": "cron(/2 * * * ? *)",
 				"State": "ENABLED",
 				"Targets": [{
 					"Id": {
 						"Fn::Join": ["-", [{
 							"Ref": "AWS::StackName"
-						}, "VGW-Poller-5min"]]
+						}, "Poller-2min"]]
 					},
 					"Arn": {
-						"Fn::GetAtt": ["AviatrixPollerSQSLambda", "Arn"]
+						"Fn::GetAtt": ["AviatrixPollerLambda", "Arn"]
 					}
 				}]
 			}
 		},
-		"AviatrixPermissionForPollerEvent": {
+		"AVXPollerEventPerm": {
 			"Type": "AWS::Lambda::Permission",
 			"Properties": {
 				"FunctionName": {
-					"Ref": "AviatrixPollerSQSLambda"
+					"Ref": "AviatrixPollerLambda"
 				},
 				"Action": "lambda:InvokeFunction",
 				"Principal": "events.amazonaws.com",

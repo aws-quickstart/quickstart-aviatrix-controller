@@ -44,7 +44,11 @@
         "ParameterValue": "subnet-23350a79"
     },
     {
-        "ParameterKey": "GatewaySizeParam",
-        "ParameterValue": "t2.large"
+        "ParameterKey": "HubGWSizeParam",
+        "ParameterValue": "t2.medium"
+    },
+    {
+        "ParameterKey": "SpokeGWSizeParam",
+        "ParameterValue": "t2.small"
     }
 ]
