@@ -1,4 +1,5 @@
-from urllib2 import Request, urlopen, URLError
+from urllib.request import Request, urlopen, URLError
+from urllib.parse import quote
 from time import sleep
 import urllib, ssl, json, logging
 import os
@@ -14,26 +15,27 @@ class Aviatrix:
         self.ctx.verify_mode = ssl.CERT_NONE
     def avx_api_call(self,method,action,parameters):
         url = "https://%s/v1/api?action=%s" % (self.controller_ip,action)
-        for key,value in parameters.iteritems():
-            value = urllib.quote(value, safe='')
+        for key,value in parameters.items():
+            value = quote(value, safe='')
             url = url + "&%s=%s" % (key,value)
         self.url = url
-        logging.info("Executing API call:%s" % self.url)
+        logging.info("aviatrix3.py - Executing API call:%s" % self.url)
         try:
             if method == "POST":
-                data = urllib.urlencode(parameters)
-                response = urlopen(self.url, data=data, context=self.ctx)
+                data = urllib.parse.urlencode(parameters).encode("utf-8")
+                response = urlopen(self.url, data=data, context=self.ctx).read().decode('utf8')
             else:
-                response = urlopen(self.url, context=self.ctx)
-            json_response = response.read()
-            logging.info("HTTP Response: %s" % json_response)
+                response = urlopen(self.url, context=self.ctx).read().decode('utf8')
+            json_response = response
+            logging.info("aviatrix3.py - HTTP Response: %s" % json_response)
             self.result = json.loads(json_response)
             if self.result['return'] == False:
                 self.results = self.result['reason']
             else:
                 self.results = self.result['results']
-        except URLError, e:
-            logging.info('Failed request. URLError: %s', str(e.reason))
+        except URLError as e:
+            logging.info('aviatrix3.py - Failed request. URLError: %s', str(e.reason))
+            raise
 
     def login(self,username,password):
         self.avx_api_call("GET","login",{ "username": username,
@@ -41,8 +43,8 @@ class Aviatrix:
         try:
             if self.result['return'] == True:
                 self.CID = self.result['CID']
-        except AttributeError,e:
-            logging.info('Login Request Failed. AttributeError: %s', str(e))
+        except AttributeError as e:
+            logging.info('aviatrix3.py - Login Request Failed. AttributeError: %s', str(e))
 
     def admin_email(self,email):
         self.avx_api_call("GET","add_admin_email_addr", { "CID": self.CID,
@@ -57,9 +59,12 @@ class Aviatrix:
 
     def initial_setup(self,subaction):
         self.avx_api_call("POST","initial_setup", { "subaction": subaction, "CID": self.CID })
-        if self.result['return'] == True:
-            sleep(self.result['results'])
-
+        try:
+            if 'return' in self.result:
+                if self.result['return'] == True:
+                    sleep(self.result['results'])
+        except AttributeError:
+            logging.info('aviatrix3.py - Seems like we weren\'t able to connect to the controller, please check Controller information')
     def setup_account_profile(self,account,password,email,cloud_type,aws_account_number,aws_role_arn,aws_role_ec2):
         self.avx_api_call("POST","setup_account_profile", { "CID": self.CID,
                                                             "account_name": account,

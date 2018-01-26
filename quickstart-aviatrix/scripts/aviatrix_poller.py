@@ -7,6 +7,14 @@ lambda_client = boto3.client('lambda')
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+#Read environment Variables
+gatewayqueue = os.environ.get("GatewayQueue")
+vpcid_hub = os.environ.get("HubVPC")
+gwsize_spoke = os.environ.get("SpokeGWSize")
+gatewaytopic = os.environ.get("GatewayTopic")
+spoketag = os.environ.get("SpokeTag")
+OtherAccountRoleApp = os.environ.get("OtherAccountRoleApp")
+
 def find_subnets(ec2,region_id,vpc_id):
     subnets_with_igw=ec2.describe_route_tables(Filters=[
         { 'Name': 'vpc-id', 'Values':[ vpc_id ]},
@@ -36,13 +44,6 @@ def get_credentials(rolearn):
     return assume_role_response
 
 def handler(event, context):
-    #Read environment Variables
-    gatewayqueue = os.environ.get("GatewayQueue")
-    vpcid_hub = os.environ.get("HubVPC")
-    gwsize_spoke = os.environ.get("SpokeGWSizeParam")
-    gatewaytopic = os.environ.get("GatewayTopic")
-    spoketag = os.environ.get("SpokeTag")
-    OtherAccountRoleApp = os.environ.get("OtherAccountRoleApp")
 
     #Gather all the regions:
     ec2=boto3.client('ec2',region_name='us-east-1')
@@ -114,6 +115,9 @@ def handler(event, context):
             message['region_spoke'] = region_id
             message['gwsize_spoke'] = gwsize_spoke
             message['vpcid_hub'] = vpcid_hub
+            message['primary_account'] = True
+            if OtherAccountRoleApp:
+                message['otheraccount'] = True
             #Finding the Public Subnet
             try:
 
@@ -151,6 +155,9 @@ def handler(event, context):
             message['region_spoke'] = region_id
             message['gwsize_spoke'] = gwsize_spoke
             message['vpcid_hub'] = vpcid_hub
+            message['primary_account'] = True
+            if OtherAccountRoleApp:
+                message['otheraccount'] = True
             logger.info('Found VPC %s waiting to be unpeered. Sending SQS message to Queue %s' % (message['vpcid_spoke'],gatewayqueue))
             #Add New Gateway to SQS
             #sqs = boto3.resource('sqs')
@@ -180,7 +187,7 @@ def handler(event, context):
                 #Create Gateway for it and Peer, when done change the Tag:spoketag = peered
                 vpcs=ec2.describe_vpcs(Filters=[
                     { 'Name': 'state', 'Values': [ 'available' ] },
-                    { 'Name': 'tag:'+spoketag, 'Values': [ 'true', 'True', 'TRUE', 'test' ] }
+                    { 'Name': 'tag:'+spoketag, 'Values': [ 'true', 'True', 'TRUE' ] }
                 ])
                 for vpc_peering in vpcs['Vpcs']:
                     message = {}
@@ -189,6 +196,7 @@ def handler(event, context):
                     message['region_spoke'] = region_id
                     message['gwsize_spoke'] = gwsize_spoke
                     message['vpcid_hub'] = vpcid_hub
+                    message['primary_account'] = False
                     message['otheraccount'] = True
 
                     #Finding the Public Subnet
@@ -228,6 +236,7 @@ def handler(event, context):
                     message['gwsize_spoke'] = gwsize_spoke
                     message['vpcid_hub'] = vpcid_hub
                     message['otheraccount'] = True
+                    message['primary_account'] = False
                     logger.info('Found VPC %s waiting to be unpeered. Sending SQS message to Queue %s' % (message['vpcid_spoke'],gatewayqueue))
                     #Add New Gateway to SQS
                     #sqs = boto3.resource('sqs')

@@ -16,10 +16,8 @@
     "Conditions" : {
       "AddParentAccountID" : { "Fn::Not" : [ { "Fn::Equals": [ { "Ref": "ParentAccountID" }, "" ] } ] }
     },
-    "Resources" :
-    {
-      "AviatrixRoleEC2" :
-      {
+    "Resources" : {
+      "AviatrixRoleEC2" : {
         "Type": "AWS::IAM::Role",
         "Properties": {
            "RoleName": "aviatrix-role-ec2",
@@ -35,9 +33,8 @@
            },
            "Path": "/"
          }
-     },
-      "AviatrixRoleApp" :
-      {
+      },
+      "AviatrixRoleApp" : {
         "Type": "AWS::IAM::Role",
         "Properties": {
            "RoleName": "aviatrix-role-app",
@@ -56,9 +53,8 @@
            },
            "Path": "/"
          }
-     },
-      "CreateAviatrixAssumeRolePolicy" :
-      {
+      },
+      "CreateAviatrixAssumeRolePolicy" : {
         "Type" : "AWS::IAM::ManagedPolicy",
         "Properties" :
         {
@@ -86,8 +82,7 @@
           } ]
         }
       },
-      "CreateAviatrixAppPolicy" :
-      {
+      "CreateAviatrixAppPolicy" : {
         "Type" : "AWS::IAM::ManagedPolicy",
         "Properties" :
         {
@@ -270,14 +265,12 @@
           } ]
         }
       },
-      "AviatrixInstanceProfile":
-      {
+  		"AviatrixInstanceProfile": {
         "Type": "AWS::IAM::InstanceProfile",
-        "Properties":
-        {
+        "Properties": {
           "InstanceProfileName": "aviatrix-role-ec2",
           "Path": "/",
-          "Roles": [ { "Ref": "AviatrixRoleEC2" } ]
+          "Roles": [ "aviatrix-role-ec2" ]
         }
       }
     },
@@ -285,7 +278,6 @@
     {
       "AccountId" : { "Description": "Amazon Account ID", "Value" : { "Ref" : "AWS::AccountId" } },
       "AviatrixRoleAppARN" : { "Description": "AviatrixRoleApp ARN", "Value" : { "Fn::GetAtt" : [ "AviatrixRoleApp" , "Arn" ] } },
-      "AviatrixRoleEC2ARN" : { "Description": "AviatrixRoleEC2 ARN", "Value" : { "Fn::GetAtt" : [ "AviatrixRoleEC2" , "Arn" ] } },
-      "AviatrixInstanceProfile" : { "Description": "Aviatrix Instance Profile", "Value" : { "Ref" :  "AviatrixInstanceProfile"} }
+      "AviatrixRoleEC2ARN" : { "Description": "AviatrixRoleEC2 ARN", "Value" : { "Fn::GetAtt" : [ "AviatrixRoleEC2" , "Arn" ] } }
     }
 }

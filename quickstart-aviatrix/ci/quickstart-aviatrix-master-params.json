@@ -1,0 +1,78 @@
+[
+    {
+        "ParameterKey": "KeyPairName",
+        "ParameterValue": "AviatrixDemo"
+    },
+    {
+        "ParameterKey": "VPCCIDR",
+        "ParameterValue": "10.0.0.0/16"
+    },
+    {
+        "ParameterKey": "AvailabilityZones",
+        "ParameterValue": "$[taskcat_genaz_2]"
+    },
+    {
+        "ParameterKey": "PublicSubnet1CIDR",
+        "ParameterValue": "10.0.10.0/24"
+    },
+    {
+        "ParameterKey": "PublicSubnet2CIDR",
+        "ParameterValue": "10.0.20.0/24"
+    },
+    {
+        "ParameterKey": "AvailabilityZones",
+        "ParameterValue": "$[taskcat_genaz_2]"
+    },
+    {
+        "ParameterKey": "AdminEmail",
+        "ParameterValue": "test@emailserver.com"
+    },
+    {
+        "ParameterKey": "Password",
+        "ParameterValue": "$[taskcat_genpass_8A]"
+    },
+    {
+        "ParameterKey": "ControllerSize",
+        "ParameterValue": "t2.medium"
+    },
+    {
+        "ParameterKey": "LicenseModel",
+        "ParameterValue": "LicenseIncluded"
+    },
+    {
+        "ParameterKey": "License",
+        "ParameterValue": ""
+    },
+    {
+        "ParameterKey": "HubGWSize",
+        "ParameterValue": "t2.medium"
+    },
+    {
+        "ParameterKey": "SpokeGWSize",
+        "ParameterValue": "t2.small"
+    },
+    {
+        "ParameterKey": "SpokeTag",
+        "ParameterValue": "aviatrix-spoke"
+    },
+    {
+        "ParameterKey": "OtherAccount",
+        "ParameterValue": ""
+    },
+    {
+        "ParameterKey": "OtherAccountRoleApp",
+        "ParameterValue": ""
+    },
+    {
+        "ParameterKey": "OtherAccountRoleEC2",
+        "ParameterValue": ""
+    },
+    {
+        "ParameterKey": "QSS3BucketName",
+        "ParameterValue": "quickstart-reference"
+    },
+    {
+        "ParameterKey": "QSS3KeyPrefix",
+        "ParameterValue": "microsoft/activedirectory/latest/"
+    }
+]

@@ -9,8 +9,8 @@ class Aviatrix_Poller_Test(unittest.TestCase):
     result=find_subnets(ec2,region_id,vpc_id)
     self.assertIs(type(result), list)
     for subnet in result:
-        self.assertEquals(subnet['SubnetId'][:6],'subnet')
-        self.assertEquals(subnet['Name'][:8],'Unittest')
+        self.assertEqual(subnet['SubnetId'][:6],'subnet')
+        self.assertEqual(subnet['Name'][:8],'Unittest')
     #Fail tests
     region_id='us-east-2'
     vpc_id='vpc-afdee5d7'
