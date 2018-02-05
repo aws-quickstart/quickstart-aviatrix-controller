@@ -1,6 +1,6 @@
 [
     {
-        "ParameterKey": "KeyPairName",
+        "ParameterKey": "KeyPair",
         "ParameterValue": "AviatrixDemo"
     },
     {
@@ -40,7 +40,7 @@
         "ParameterValue": "LicenseIncluded"
     },
     {
-        "ParameterKey": "License",
+        "ParameterKey": "LicenseKey",
         "ParameterValue": ""
     },
     {

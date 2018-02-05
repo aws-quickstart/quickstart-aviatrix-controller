@@ -7,28 +7,28 @@
     {
       "ParameterGroups" :
       [
-        { "Label" : { "default": "Amazon EC2 Configuration" }, "Parameters" : [ "KeyPairName" ] },
+        { "Label" : { "default": "Amazon EC2 Configuration" }, "Parameters" : [ "KeyPair" ] },
         { "Label" : { "default" : "VPC Configuration"}, "Parameters" : [ "VPCCIDR", "PublicSubnet1CIDR", "PublicSubnet2CIDR", "AvailabilityZones" ] },
         { "Label" : { "default" : "Controller Information" }, "Parameters" : [ "AdminEmail", "Password", "ControllerSize" ] },
-        { "Label" : { "default" : "Licensing Configuration"}, "Parameters" : [ "LicenseModel", "License" ] },
+        { "Label" : { "default" : "Licensing Configuration"}, "Parameters" : [ "LicenseModel", "LicenseKey" ] },
         { "Label" : { "default" : "Gateway Information" }, "Parameters" : [ "HubGWSize", "SpokeGWSize", "SpokeTag"] },
         { "Label" : { "default" : "Optional 2nd AWS Account Configuration" }, "Parameters" : [ "OtherAccount", "OtherAccountRoleApp", "OtherAccountRoleEC2"] },
         { "Label": { "default": "AWS Quick Start Configuration" }, "Parameters": [ "QSS3BucketName", "QSS3KeyPrefix" ] }
       ],
       "ParameterLabels" :
       {
-        "KeyPairName" : { "default" : "Which keypair will be used?" },
+        "KeyPair" : { "default" : "Which keypair will be used" },
         "VPCCIDR": { "default": "VPC CIDR" },
         "AvailabilityZones" : { "default": "Availability zones" },
         "PublicSubnet1CIDR": { "default": "Public Subnet 1 CIDR" },
         "PublicSubnet2CIDR": { "default": "Public Subnet 2 CIDR" },
-        "AdminEmail" : { "default" : "Administrator email address?"},
-        "Password" : { "default" : "Password for admin on Aviatrix Controller? " },
-        "ControllerSize" : { "default" : "Instance Size for the Aviatrix Controller?"},
-        "LicenseModel" : { "default" : "Licensing Model?:"},
-        "License" :  { "default" : "Enter your license key:"},
-        "HubGWSize" : { "default" : "Instance Size for the Aviatrix Hub Gateway?" },
-        "SpokeGWSize" : { "default" : "Instance Size for the Aviatrix Spoke Gateways?" },
+        "AdminEmail" : { "default" : "Administrator email address"},
+        "Password" : { "default" : "Password for admin on Aviatrix Controller " },
+        "ControllerSize" : { "default" : "Aviatrix Controller instance type"},
+        "LicenseModel" : { "default" : "Licensing Model:"},
+        "LicenseKey" :  { "default" : "Enter your license key:"},
+        "HubGWSize" : { "default" : "Aviatrix Hub Gateway instance type" },
+        "SpokeGWSize" : { "default" : "Aviatrix Spoke Gateways instance type" },
         "SpokeTag" : { "default" : "Spoke VPC Tag Name" },
         "OtherAccount" : { "default" : "Second Account number"},
         "OtherAccountRoleApp" : { "default" : "ARN for Aviatrix-role-app on secondary account"},
@@ -39,7 +39,7 @@
     }
   },
   "Parameters": {
-    "KeyPairName": {
+    "KeyPair": {
       "Type": "AWS::EC2::KeyPair::KeyName",
       "Description": "Select your Keypair"
     },
@@ -89,7 +89,7 @@
       "Default" : "LicenseIncluded",
       "AllowedValues" : [ "LicenseIncluded", "BYOL" ]
     },
-    "License": {
+    "LicenseKey": {
       "Description" : "If you don't have one, please contact sales@aviatrix.com. For LicenseIncluded leave BLANK",
       "Type" : "String"
     },
@@ -108,7 +108,7 @@
     "SpokeTag" :{
       "Type" : "String",
       "Default" : "aviatrix-spoke",
-      "Description" : "Tag to be used to identify spoke VPCs to connect to Transit VPC. Default is aviatrix-spoke."
+      "Description" : "Tag to be used to identify spoke VPCs to connect to Transit VPC."
     },
     "OtherAccount" : {
         "Type" : "String",
@@ -141,7 +141,7 @@
      }
   },
   "Conditions" : {
-    "NotBlankLicense" : { "Fn::Not" : [ { "Fn::Equals": [ { "Ref": "License" }, "" ] } ] },
+    "NotBlankLicense" : { "Fn::Not" : [ { "Fn::Equals": [ { "Ref": "LicenseKey" }, "" ] } ] },
     "GovCloudCondition": {
             "Fn::Equals": [
                 {
@@ -172,443 +172,91 @@
   },
   "Resources" : {
     "VPCStack": {
-            "Type": "AWS::CloudFormation::Stack",
-            "Properties": {
-                "TemplateURL": {
-                    "Fn::Sub": [
-                        "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-aws-vpc/templates/aws-vpc.template",
+        "Type": "AWS::CloudFormation::Stack",
+        "Properties": {
+            "TemplateURL": {
+                "Fn::Sub": [
+                    "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-aws-vpc/templates/aws-vpc.template",
+                    {
+                        "QSS3Region": {
+                            "Fn::If": [
+                                "GovCloudCondition",
+                                "s3-us-gov-west-1",
+                                "s3"
+                            ]
+                        }
+                    }
+                ]
+            },
+            "Parameters": {
+                "AvailabilityZones": {
+                    "Fn::Join": [
+                        ",",
                         {
-                            "QSS3Region": {
-                                "Fn::If": [
-                                    "GovCloudCondition",
-                                    "s3-us-gov-west-1",
-                                    "s3"
-                                ]
-                            }
+                            "Ref": "AvailabilityZones"
                         }
                     ]
                 },
-                "Parameters": {
-                    "AvailabilityZones": {
-                        "Fn::Join": [
-                            ",",
-                            {
-                                "Ref": "AvailabilityZones"
-                            }
-                        ]
-                    },
-                    "KeyPairName": {
-                        "Ref": "KeyPairName"
-                    },
-                    "NumberOfAZs": "2",
-                    "PublicSubnet1CIDR": {
-                        "Ref": "PublicSubnet1CIDR"
-                    },
-                    "PublicSubnet2CIDR": {
-                        "Ref": "PublicSubnet2CIDR"
-                    },
-                    "VPCCIDR": {
-                        "Ref": "VPCCIDR"
-                    },
-                    "CreatePrivateSubnets" : "false"
-                }
+                "KeyPairName": {
+                    "Ref": "KeyPair"
+                },
+                "NumberOfAZs": "2",
+                "PublicSubnet1CIDR": {
+                    "Ref": "PublicSubnet1CIDR"
+                },
+                "PublicSubnet2CIDR": {
+                    "Ref": "PublicSubnet2CIDR"
+                },
+                "VPCCIDR": {
+                    "Ref": "VPCCIDR"
+                },
+                "CreatePrivateSubnets" : "false"
             }
-        },
-
-    "AVXSG": {
-      "DependsOn" : "VPCStack",
-      "Type": "AWS::EC2::SecurityGroup",
-      "Properties": {
-        "GroupDescription": "Aviatrix - Allow HTTPS to Controller",
-        "VpcId":  { "Fn::GetAtt" : [ "VPCStack", "Outputs.VPCID" ] } ,
-        "SecurityGroupIngress": [ {
-          "IpProtocol": "tcp",
-          "CidrIp": "0.0.0.0/0",
-          "FromPort": "443",
-          "ToPort": "443"
-        } ],
-        "Tags": [
-          { "Key": "Name", "Value": "Aviatrix Security Group" },
-          { "Key": "Project", "Value": "Aviatrix" },
-          { "Key": "CreatedUsing", "Value": "Aviatrix Quickstart" }
-        ]
-      }
-    },
-    "AVXController" : {
-      "DependsOn" : [ "VPCStack" , "AVXSG" ],
-      "Type" : "AWS::EC2::Instance",
-      "Properties" : {
-        "ImageId" : { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, { "Ref": "LicenseModel" } ] },
-        "KeyName" : { "Ref": "KeyPairName" },
-        "InstanceType": { "Ref" : "ControllerSize" },
-        "IamInstanceProfile" : "aviatrix-role-ec2",
-        "NetworkInterfaces": [ {
-          "DeviceIndex": "0",
-          "GroupSet": [ { "Ref" : "AVXSG" } ],
-          "SubnetId": { "Fn::GetAtt" : [ "VPCStack", "Outputs.PublicSubnet1ID" ] }
-        } ],
-        "Tags": [
-          { "Key": "Name", "Value": "Aviatrix Controller" },
-          { "Key": "Project", "Value": "Aviatrix" },
-          { "Key": "CreatedUsing", "Value": "Aviatrix Quickstart" }
-        ]
-      }
-    },
-    "AVXEIP": {
-      "DependsOn" : "AVXController",
-      "Type": "AWS::EC2::EIP",
-      "Properties" : {
-        "InstanceId" : {"Ref":  "AVXController" }
-      }
+        }
     },
 
-    "AVXRoleAPI": {
-      "Type": "AWS::IAM::Role",
+    "AVXStack":{
+      "DependsOn": [ "VPCStack" ],
+      "Type": "AWS::CloudFormation::Stack",
       "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [{
-            "Effect": "Allow",
-            "Principal": {
-              "Service": [
-                "lambda.amazonaws.com",
-                "edgelambda.amazonaws.com"
+          "TemplateURL": {
+              "Fn::Sub": [
+                  "https://s3.amazonaws.com/quickstart-aviatrix-us-east-1/quickstart-aviatrix/templates/quickstart-aviatrix.template",
+                  {
+                      "QSS3Region": {
+                          "Fn::If": [
+                              "GovCloudCondition",
+                              "s3-us-gov-west-1",
+                              "s3"
+                          ]
+                      }
+                  }
               ]
-            },
-            "Action": ["sts:AssumeRole"]
-          }]
-        },
-        "Path": "/"
-      }
-    },
-    "AVXAPIRolePolicy": {
-      "DependsOn": [ "AVXRoleAPI" ],
-      "Type": "AWS::IAM::ManagedPolicy",
-      "Properties": {
-        "Description": "Policy for creating aviatrix-api-role-policy",
-        "Path": "/",
-        "PolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [{
-            "Effect": "Allow",
-            "Action": [
-              "logs:CreateLogGroup",
-              "logs:CreateLogStream",
-              "logs:PutLogEvents",
-              "ec2:Describe*",
-              "ec2:CreateTags",
-              "SNS:Publish",
-              "STS:AssumeRole"
-            ],
-            "Resource": "*"
-          }]
-        },
-        "Roles": [{
-          "Ref": "AVXRoleAPI"
-        }]
-      }
-    },
-
-    "AVXKey": {
-      "DependsOn": "AVXRoleAPI",
-      "Type": "AWS::KMS::Key",
-      "Properties": {
-        "Description": "Key to encrypt Aviatrix Data",
-        "KeyPolicy": {
-          "Version": "2012-10-17",
-          "Id": "key-default-1",
-          "Statement": [ {
-              "Sid": "Enable IAM User Permissions",
-              "Effect": "Allow",
-              "Principal": {
-                "AWS": [
-                  { "Fn::Join": [ "", [ "arn:aws:iam::", { "Ref": "AWS::AccountId" }, ":root" ] ] }
-                ]
-              },
-              "Action": "kms:*",
-              "Resource": "*"
-            },
-            {
-              "Sid": "Allow use of the key",
-              "Effect": "Allow",
-              "Principal": {
-                "AWS": [
-                  { "Fn::GetAtt": [ "AVXRoleAPI", "Arn" ] }
-                ]
-              },
-              "Action": [
-                "kms:Encrypt",
-                "kms:Decrypt",
-                "kms:ReEncrypt*",
-                "kms:GenerateDataKey*",
-                "kms:DescribeKey"
-              ],
-              "Resource": "*"
-            }
-          ]
-        }
-      }
-    },
-    "AVXGWQueue": {
-      "Type": "AWS::SQS::Queue"
-    },
-    "AVXControllerLambda": {
-      "DependsOn": "AVXEIP",
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Handler": "aviatrix_controller.handler",
-        "Role": {
-          "Fn::GetAtt": [ "AVXRoleAPI", "Arn" ]
-        },
-        "Code": {
-          "S3Bucket": {
-            "Fn::Join": [ "", [ "quickstart-aviatrix-", { "Ref": "AWS::Region" } ] ]
           },
-          "S3Key": "quickstart-aviatrix/scripts/aviatrix_controller.py.zip"
-        },
-        "KmsKeyArn": {
-          "Fn::GetAtt": [ "AVXKey", "Arn" ]
-        },
-        "Environment": {
-          "Variables": {
-            "Controller_IP": {
-              "Fn::GetAtt" : [ "AVXController" , "PublicIp" ]
-            },
-            "Username": "admin",
-            "Private_IP": {
-              "Fn::GetAtt" : [ "AVXController" , "PrivateIp" ]
-            },
-            "Admin_Email": {
-              "Ref": "AdminEmail"
-            },
-            "Password": {
-              "Ref": "Password"
-            },
-            "Account": {
-              "Ref": "AWS::AccountId"
-            },
-            "AviatrixRoleApp": {
-              "Fn::Join": [ "", [ "arn:aws:iam::", { "Ref": "AWS::AccountId" }, ":role/aviatrix-role-app" ] ]
-            },
-            "AviatrixRoleEC2": {
-              "Fn::Join": [ "", [ "arn:aws:iam::", { "Ref": "AWS::AccountId" }, ":role/aviatrix-role-ec2" ] ]
-            },
-            "VPC": {
-              "Fn::GetAtt" : [ "VPCStack" , "Outputs.VPCID" ]
-            },
-            "Subnet": {
-              "Ref": "PublicSubnet1CIDR"
-            },
-            "SubnetHA": {
-              "Ref": "PublicSubnet2CIDR"
-            },
-            "Region": {
-              "Ref": "AWS::Region"
-            },
-            "HubGWSize": {
-              "Ref": "HubGWSize"
-            },
-            "SpokeGWSize": {
-              "Ref": "SpokeGWSize"
-            },
-            "GatewayQueue": {
-              "Fn::GetAtt": ["AVXGWQueue", "QueueName"]
-            },
-            "GatewayQueueURL": {
-              "Ref": "AVXGWQueue"
-            },
-            "GatewayTopic": {
-              "Ref": "AVXGWTopic"
-            },
-            "OtherAccount": {
-              "Ref": "OtherAccount"
-            },
-            "OtherAccountRoleApp": {
-              "Ref": "OtherAccountRoleApp"
-            },
-            "OtherAccountRoleEC2": {
-              "Ref": "OtherAccountRoleEC2"
-            },
-            "LicenseModel" : {
-              "Ref": "LicenseModel"
-            },
-            "License" : {
-              "Ref": "License"
-            }
+          "Parameters": {
+            "KeyPair": { "Ref": "KeyPair"},
+            "VPCID": { "Fn::GetAtt": [ "VPCStack", "Outputs.VPCID" ]},
+            "PublicSubnet1": { "Fn::GetAtt": [ "VPCStack", "Outputs.PublicSubnet1ID" ]},
+            "PublicSubnet1CIDR": { "Fn::GetAtt": [ "VPCStack", "Outputs.PublicSubnet1CIDR" ]},
+            "PublicSubnet2": { "Fn::GetAtt": [ "VPCStack", "Outputs.PublicSubnet2ID" ]},
+            "PublicSubnet2CIDR": { "Fn::GetAtt": [ "VPCStack", "Outputs.PublicSubnet2CIDR" ]},
+            "AdminEmail": { "Ref": "AdminEmail"},
+            "Password": { "Ref": "Password"},
+            "ControllerSize": { "Ref": "ControllerSize"},
+            "LicenseModel": { "Ref": "LicenseModel"},
+            "LicenseKey": { "Ref": "LicenseKey"},
+            "HubGWSize": { "Ref": "HubGWSize"},
+            "SpokeGWSize": { "Ref": "SpokeGWSize"},
+            "SpokeTag": { "Ref": "SpokeTag"},
+            "OtherAccount": { "Ref": "OtherAccount"},
+            "OtherAccountRoleApp": { "Ref": "OtherAccountRoleApp"},
+            "OtherAccountRoleEC2": { "Ref": "OtherAccountRoleEC2"}
           }
-        },
-        "Runtime": "python3.6",
-        "Timeout": "300"
-      }
-    },
-    "AVXControllerLambdaTrigger": {
-      "Type": "Custom::ControllerLamdbdaTrigger",
-      "Properties": {
-        "ServiceToken": {
-          "Fn::GetAtt": [
-            "AVXControllerLambda",
-            "Arn"
-          ]
-        }
-      }
-    },
-    "AVXGatewayLambda": {
-      "DependsOn": "AVXEIP",
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Handler": "aviatrix_gateway.handler",
-        "Role": {
-          "Fn::GetAtt": [ "AVXRoleAPI", "Arn" ]
-        },
-        "Code": {
-          "S3Bucket": {
-            "Fn::Join": [ "", [ "quickstart-aviatrix-", { "Ref": "AWS::Region" } ] ]
-          },
-          "S3Key": "quickstart-aviatrix/scripts/aviatrix_gateway.py.zip"
-        },
-        "KmsKeyArn": {
-          "Fn::GetAtt": [ "AVXKey", "Arn" ]
-        },
-        "Environment": {
-          "Variables": {
-            "Controller_IP": {
-              "Fn::GetAtt" : [ "AVXController" , "PublicIp" ]
-            },
-            "Username": "admin",
-            "Password": {
-              "Ref": "Password"
-            },
-            "VPC": {
-              "Fn::GetAtt" : [ "VPCStack" , "Outputs.VPCID" ]
-            },
-            "Region": {
-              "Ref": "AWS::Region"
-            },
-            "HubGWSize": {
-              "Ref": "HubGWSize"
-            },
-            "SpokeGWSize": {
-              "Ref": "SpokeGWSize"
-            },
-            "SpokeTag": {
-              "Ref": "SpokeTag"
-            },
-            "OtherAccountRoleApp": {
-              "Ref": "OtherAccountRoleApp"
-            },
-            "GatewayQueue": {
-              "Fn::GetAtt": ["AVXGWQueue", "QueueName"]
-            },
-            "GatewayQueueURL": {
-              "Ref": "AVXGWQueue"
-            }
-          }
-        },
-        "Runtime": "python3.6",
-        "Timeout": "300"
-      }
-    },
-    "AVXGWTopic": {
-      "Type": "AWS::SNS::Topic",
-      "Properties": {
-        "Subscription": [{
-          "Endpoint": {
-            "Fn::GetAtt": [ "AVXGatewayLambda", "Arn" ]
-          },
-          "Protocol": "lambda"
-        }]
-      }
-    },
-    "InvokeGWLambda": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "Principal": "sns.amazonaws.com",
-        "SourceArn": {
-          "Ref": "AVXGWTopic"
-        },
-        "FunctionName": {
-          "Fn::GetAtt": [ "AVXGatewayLambda", "Arn" ]
-        }
-      }
-    },
-    "AVXPollerLambda": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Handler": "aviatrix_poller.handler",
-        "Role": {
-          "Fn::GetAtt": [ "AVXRoleAPI", "Arn" ]
-        },
-        "Code": {
-          "S3Bucket": {
-            "Fn::Join": [ "", [ "quickstart-aviatrix-", { "Ref": "AWS::Region" } ] ]
-          },
-          "S3Key": "quickstart-aviatrix/scripts/aviatrix_poller.py.zip"
-        },
-        "KmsKeyArn": {
-          "Fn::GetAtt": [ "AVXKey", "Arn" ]
-        },
-        "Environment": {
-          "Variables": {
-            "GatewayQueue": {
-              "Fn::GetAtt": [ "AVXGWQueue", "QueueName" ]
-            },
-            "GatewayQueueURL": {
-              "Ref": "AVXGWQueue"
-            },
-            "HubVPC": {
-              "Fn::GetAtt" : [ "VPCStack" , "Outputs.VPCID" ]
-            },
-            "SpokeGWSize": {
-              "Ref": "SpokeGWSize"
-            },
-            "SpokeTag": {
-              "Ref": "SpokeTag"
-            },
-            "OtherAccountRoleApp": {
-              "Ref": "OtherAccountRoleApp"
-            },
-            "GatewayTopic": {
-              "Ref": "AVXGWTopic"
-            }
-          }
-        },
-        "Runtime": "python3.6",
-        "Timeout": "300"
-      }
-    },
-    "AVXPollerEvent": {
-      "Type": "AWS::Events::Rule",
-      "Properties": {
-        "Description": "Rule to trigger AviatrixPoller every 2 minutes to find VPCs that need to be attached to the Transit Hub VPC.",
-        "ScheduleExpression": "cron(/2 * * * ? *)",
-        "State": "ENABLED",
-        "Targets": [ {
-          "Id": {
-            "Fn::Join": [ "-", [ { "Ref": "AWS::StackName" }, "Poller-2min" ] ]
-          },
-          "Arn": {
-            "Fn::GetAtt": [ "AVXPollerLambda", "Arn" ]
-          }
-        } ]
-      }
-    },
-    "AVXPollerEventPerm": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "FunctionName": {
-          "Ref": "AVXPollerLambda"
-        },
-        "Action": "lambda:InvokeFunction",
-        "Principal": "events.amazonaws.com",
-        "SourceArn": {
-          "Fn::GetAtt": [ "AVXPollerEvent", "Arn" ]
-        }
       }
     }
   },
   "Outputs" : {
-    "AviatrixControllerEIP" : { "Description": "AviatrixController External IP", "Value" : { "Fn::GetAtt" : [ "AVXController" , "PublicIp" ] } },
-    "AviatrixControllerPrivateIP" : { "Description": "AviatrixController Private IP", "Value" : { "Fn::GetAtt" : [ "AVXController" , "PrivateIp" ] } }
+    "AviatrixControllerEIP" : { "Description": "AviatrixController External IP", "Value" : { "Fn::GetAtt" : [ "AVXStack" , "Outputs.AviatrixControllerEIP" ] } },
+    "AviatrixControllerPrivateIP" : { "Description": "AviatrixController Private IP", "Value" : { "Fn::GetAtt" : [ "AVXStack" , "Outputs.AviatrixControllerPrivateIP" ] } }
   }
 }
