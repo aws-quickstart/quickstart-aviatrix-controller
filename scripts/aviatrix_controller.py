@@ -208,12 +208,17 @@ def delete_handler(event, context):
             logger.info('aviatrix-controller.py - Deleting existing tunnels')
             #To be done
             #for tunnel in tunnels delete each one.
+        logger.info('aviatrix-controller.py - Checking for Gateways that are still online')
         controller.list_vpcs_summary("admin")
         gateways=controller.results
+        logger.info('aviatrix-controller.py - These Gateways are still online: %s' % gateways)
         if gateways:
             for gateway in gateways:
                 logger.info('aviatrix-controller.py - Deleting gateway %s', gateway['vpc_name'])
                 controller.delete_gateway('1',gateway['vpc_name'])
+        logger.info('Waiting for controller to be completely done')
+        time.sleep(30)
+        logger.info('Sending CFT response Signal')
         responseData = {
             "PhysicalResourceId": "arn:aws:fake:myID"
         }

@@ -33,7 +33,7 @@
     },
     {
         "ParameterKey": "ControllerSize",
-        "ParameterValue": "t2.medium"
+        "ParameterValue": "t2.large"
     },
     {
         "ParameterKey": "LicenseModel",
@@ -54,6 +54,10 @@
     {
         "ParameterKey": "SpokeTag",
         "ParameterValue": "aviatrix-spoke"
+    },
+    {
+        "ParameterKey": "CreateIamRole",
+        "ParameterValue": "Yes"
     },
     {
         "ParameterKey": "OtherAccount",

@@ -12,6 +12,7 @@
         { "Label" : { "default" : "Controller Information" }, "Parameters" : [ "AdminEmail", "Password", "ControllerSize" ] },
         { "Label" : { "default" : "Licensing Configuration"}, "Parameters" : [ "LicenseModel", "LicenseKey" ] },
         { "Label" : { "default" : "Gateway Information" }, "Parameters" : [ "HubGWSize", "SpokeGWSize", "SpokeTag"] },
+        { "Label" : { "default" : "IAM Roles" }, "Parameters" : [ "CreateIamRole" ] },
         { "Label" : { "default" : "Optional 2nd AWS Account Configuration" }, "Parameters" : [ "OtherAccount", "OtherAccountRoleApp", "OtherAccountRoleEC2"] }
       ],
       "ParameterLabels" :
@@ -30,6 +31,7 @@
         "HubGWSize" : { "default" : "Aviatrix Hub Gateway instance type" },
         "SpokeGWSize" : { "default" : "Aviatrix Spoke Gateway instance type" },
         "SpokeTag" : { "default" : "Spoke VPC Tag Name" },
+        "CreateIamRole" : { "default" : "Create the IAM roles"},
         "OtherAccount" : { "default" : "Second Account number"},
         "OtherAccountRoleApp" : { "default" : "ARN for Aviatrix-role-app on secondary account"},
         "OtherAccountRoleEC2" : { "default" : "ARN for aviatrix-role-ec2 on secondary account"}
@@ -73,9 +75,9 @@
     },
     "ControllerSize": {
       "Type" : "String",
-      "Default" : "t2.medium",
-      "AllowedValues" : ["t2.medium", "m3.medium","m3.large","m3.xlarge","m4.large","m4.xlarge","c4.large","c4.xlarge"],
-      "Description" : "Select an instance size. Default is t2.medium."
+      "Default" : "t2.large",
+      "AllowedValues" : ["t2.large", "m3.medium","m3.large","m3.xlarge","m4.large","m4.xlarge","c4.large","c4.xlarge"],
+      "Description" : "Select an instance size. Default is t2.large."
     },
     "LicenseModel" : {
       "Description" : "Choose between BYOL or License Included - licensing models.",
@@ -104,6 +106,12 @@
       "Default" : "aviatrix-spoke",
       "Description" : "Tag to be used to identify spoke VPCs to connect to Transit VPC. Default is aviatrix-spoke."
     },
+    "CreateIamRole": {
+      "Type" : "String",
+      "Default" : "Yes",
+      "AllowedValues" : ["Yes","No"],
+      "Description" : "Create an IAM roles"
+    },
     "OtherAccount" : {
         "Type" : "String",
         "Default" : "",
@@ -129,6 +137,14 @@
                 },
                 "us-gov-west-1"
             ]
+    },
+    "CreateIamRoleCondition": {
+            "Fn::Equals": [
+                {
+                    "Ref": "CreateIamRole"
+                },
+                "Yes"
+            ]
     }
   },
   "Mappings" : {
@@ -136,7 +152,7 @@
       "us-east-1" : { "LicenseIncluded" : "ami-855463ff",  "BYOL": "ami-db9bb9a1" },
       "us-east-2" : { "LicenseIncluded" : "ami-9db399f8",  "BYOL": "ami-b40228d1" },
       "us-west-1" : { "LicenseIncluded" : "ami-ee1b168e",  "BYOL": "ami-2a7e7c4a" },
-      "us-west-2" : { "LicenseIncluded" : "	ami-baea56c2",  "BYOL": "ami-fd48f885" },
+      "us-west-2" : { "LicenseIncluded" : "ami-baea56c2",  "BYOL": "ami-fd48f885" },
       "ca-central-1" : { "LicenseIncluded" : "ami-a90184cd",  "BYOL": "ami-de4bceba" },
       "eu-central-1" : { "LicenseIncluded" : "ami-49c05926",  "BYOL": "ami-a025b9cf" },
       "eu-west-1" : { "LicenseIncluded" : "ami-5c99fc25",  "BYOL": "ami-830d93fa" },
@@ -151,6 +167,284 @@
     }
   },
   "Resources" : {
+    "AviatrixRoleEC2" : {
+      "Condition": "CreateIamRoleCondition",
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+         "RoleName": "aviatrix-role-ec2",
+         "AssumeRolePolicyDocument": {
+            "Version" : "2012-10-17",
+            "Statement": [ {
+               "Effect": "Allow",
+               "Principal": {
+                  "Service": [ "ec2.amazonaws.com" ]
+               },
+               "Action": [ "sts:AssumeRole" ]
+            } ]
+         },
+         "Path": "/"
+       }
+    },
+    "AviatrixRoleApp" : {
+      "Condition": "CreateIamRoleCondition",
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+         "RoleName": "aviatrix-role-app",
+         "AssumeRolePolicyDocument": {
+            "Version" : "2012-10-17",
+            "Statement": [ {
+               "Effect": "Allow",
+               "Principal": { "AWS": [ { "Fn::Join" : [ "", [ "arn:aws:iam::", { "Ref" : "AWS::AccountId" } , ":root" ] ] } ] },
+               "Action": [ "sts:AssumeRole" ]
+            } ]
+         },
+         "Path": "/"
+       }
+    },
+    "CreateAviatrixAssumeRolePolicy" : {
+      "Condition": "CreateIamRoleCondition",
+      "DependsOn": [ "AviatrixRoleEC2", "AviatrixRoleApp" ],
+      "Type" : "AWS::IAM::ManagedPolicy",
+      "Properties" :
+      {
+        "ManagedPolicyName" : "aviatrix-assume-role-policy",
+        "Description" : "Policy for creating aviatrix-assume-role-policy",
+        "Path" : "/",
+        "PolicyDocument" :
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+              {
+                  "Effect": "Allow",
+
+            "Action": [
+                      "iam:UpdateAssumeRolePolicy",
+                      "sts:AssumeRole"
+                  ],
+                  "Resource": "arn:aws:iam::*"
+              }
+          ]
+        },
+        "Roles" :
+        [ {
+          "Ref": "AviatrixRoleEC2"
+        } ]
+      }
+    },
+    "CreateAviatrixAppPolicy" : {
+      "Condition": "CreateIamRoleCondition",
+      "DependsOn": [ "AviatrixRoleEC2", "AviatrixRoleApp" ],
+      "Type" : "AWS::IAM::ManagedPolicy",
+      "Properties" :
+      {
+        "ManagedPolicyName" : "aviatrix-app-policy",
+        "Description" : "Policy for creating aviatrix-app-policy",
+        "Path" : "/",
+        "PolicyDocument" :
+        {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "ec2:Describe*",
+                        "elasticloadbalancing:Describe*",
+                        "route53:List*",
+                        "route53:Get*",
+                        "sqs:Get*",
+                        "sqs:List*",
+                        "sns:List*",
+                        "s3:List*",
+                        "s3:Get*",
+                        "iam:List*",
+                        "iam:Get*"
+                    ],
+                    "Resource": "*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "ec2:RunInstances"
+                    ],
+                    "Resource": "*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": "ec2:RunInstances",
+                    "Resource": "arn:aws:ec2:*:*:image/ami-*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "ec2:DeleteSecurityGroup",
+                        "ec2:RevokeSecurityGroupEgress",
+                        "ec2:RevokeSecurityGroupIngress",
+                        "ec2:AuthorizeSecurityGroup*",
+                        "ec2:CreateSecurityGroup",
+                        "ec2:AssociateRouteTable",
+                        "ec2:CreateRoute",
+                        "ec2:CreateRouteTable",
+                        "ec2:DeleteRoute",
+                        "ec2:DeleteRouteTable",
+                        "ec2:DisassociateRouteTable",
+                        "ec2:ReplaceRoute",
+                        "ec2:ReplaceRouteTableAssociation"
+                    ],
+                    "Resource": "*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "ec2:AllocateAddress",
+                        "ec2:AssociateAddress",
+                        "ec2:DisassociateAddress",
+                        "ec2:ReleaseAddress",
+                        "ec2:AssignPrivateIpAddresses",
+                        "ec2:AttachNetworkInterface",
+                        "ec2:CreateNetworkInterface",
+                        "ec2:DeleteNetworkInterface",
+                        "ec2:DetachNetworkInterface",
+                        "ec2:ModifyNetworkInterfaceAttribute",
+                        "ec2:ResetNetworkInterfaceAttribute",
+                        "ec2:UnassignPrivateIpAddresses",
+                        "ec2:ModifyInstanceAttribute",
+                        "ec2:MonitorInstances",
+                        "ec2:RebootInstances",
+                        "ec2:ReportInstanceStatus",
+                        "ec2:ResetInstanceAttribute",
+                        "ec2:StartInstances",
+                        "ec2:StopInstances",
+                        "ec2:TerminateInstances",
+                        "ec2:UnmonitorInstances",
+                        "ec2:AttachInternetGateway",
+                        "ec2:CreateInternetGateway",
+                        "ec2:DeleteInternetGateway",
+                        "ec2:DetachInternetGateway",
+                        "ec2:CreateKeyPair",
+                        "ec2:DeleteKeyPair",
+                        "ec2:CreateSubnet",
+                        "ec2:DeleteSubnet",
+                        "ec2:ModifySubnetAttribute",
+                        "ec2:CreateTags",
+                        "ec2:DeleteTags",
+                        "ec2:CreateVpc",
+                        "ec2:DeleteVpc",
+                        "ec2:ModifyVpcAttribute",
+                        "ec2:CreateCustomerGateway",
+                        "ec2:DeleteCustomerGateway",
+                        "ec2:CreateVpnConnection",
+                        "ec2:DeleteVpnConnection",
+                        "ec2:CreateVpcPeeringConnection",
+                        "ec2:AcceptVpcPeeringConnection",
+                        "ec2:DeleteVpcPeeringConnection"
+                    ],
+                    "Resource": "*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "elasticloadbalancing:ApplySecurityGroupsToLoadBalancer",
+                        "elasticloadbalancing:AttachLoadBalancerToSubnets",
+                        "elasticloadbalancing:ConfigureHealthCheck",
+                        "elasticloadbalancing:CreateLoadBalancer*",
+                        "elasticloadbalancing:DeleteLoadBalancer*",
+                        "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+                        "elasticloadbalancing:ModifyLoadBalancerAttributes",
+                        "elasticloadbalancing:SetLoadBalancerPoliciesForBackendServer",
+                        "elasticloadbalancing:RegisterInstancesWithLoadBalancer"
+                    ],
+                    "Resource": "*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "route53:ChangeResourceRecordSets",
+                        "route53:CreateHostedZone",
+                        "route53:DeleteHostedZone"
+                    ],
+                    "Resource": "*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "s3:CreateBucket",
+                        "s3:DeleteBucket",
+                        "s3:PutObject",
+                        "s3:DeleteObject"
+                    ],
+                    "Resource": "*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "sqs:AddPermission",
+                        "sqs:ChangeMessageVisibility",
+                        "sqs:CreateQueue",
+                        "sqs:DeleteMessage",
+                        "sqs:DeleteQueue",
+                        "sqs:PurgeQueue",
+                        "sqs:ReceiveMessage",
+                        "sqs:RemovePermission",
+                        "sqs:SendMessage",
+                        "sqs:SetQueueAttributes"
+                    ],
+                    "Resource": "*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "sts:AssumeRole"
+                    ],
+                    "Resource": "arn:aws:iam::*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "iam:PassRole",
+                        "iam:AddRoleToInstanceProfile",
+                        "iam:CreateInstanceProfile",
+                        "iam:DeleteInstanceProfile",
+                        "iam:RemoveRoleFromInstanceProfile"
+                    ],
+                    "Resource": "*"
+                }
+            ]
+        },
+        "Roles" :
+        [ {
+          "Ref": "AviatrixRoleApp"
+        } ]
+      }
+    },
+    "AviatrixInstanceProfile": {
+      "Condition": "CreateIamRoleCondition",
+      "DependsOn": [ "AviatrixRoleEC2", "CreateAviatrixAssumeRolePolicy", "CreateAviatrixAppPolicy" ],
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "InstanceProfileName": "aviatrix-role-ec2",
+        "Path": "/",
+        "Roles": [ "aviatrix-role-ec2" ]
+      }
+    },
+
+    "WaitHandle": {
+    	"Type" : "AWS::CloudFormation::WaitConditionHandle",
+   		"Properties" : {}
+    },
+    "IamRoleWaitHandle": {
+    	"DependsOn": [ "AviatrixRoleEC2", "AviatrixRoleApp", "CreateAviatrixAssumeRolePolicy", "CreateAviatrixAppPolicy", "AviatrixInstanceProfile" ],
+    	"Condition": "CreateIamRoleCondition",
+    	"Type" : "AWS::CloudFormation::WaitConditionHandle",
+   		"Properties" : {}
+    },
+    "WaitCondition": {
+    	"Type" : "AWS::CloudFormation::WaitCondition",
+    	"Properties" : {
+	      "Count" : 0,
+	      "Handle" : {"Fn::If": ["CreateIamRoleCondition", {"Ref": "IamRoleWaitHandle"}, {"Ref": "WaitHandle"}]},
+	      "Timeout" : 1
+   		}
+    },
 
     "AVXSG": {
       "Type": "AWS::EC2::SecurityGroup",
@@ -171,7 +465,7 @@
       }
     },
     "AVXController" : {
-      "DependsOn" : [ "AVXSG" ],
+      "DependsOn" : [ "AVXSG", "WaitCondition" ],
       "Type" : "AWS::EC2::Instance",
       "Properties" : {
         "ImageId" : { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, { "Ref": "LicenseModel" } ] },
@@ -289,7 +583,7 @@
       "Type": "AWS::SQS::Queue"
     },
     "AVXControllerLambda": {
-      "DependsOn": "AVXEIP",
+      "DependsOn": [ "AVXEIP", "AVXRoleAPI", "AVXAPIRolePolicy", "AVXKey", "AVXGWQueue", "AVXGWTopic" ],
       "Type": "AWS::Lambda::Function",
       "Properties": {
         "Handler": "aviatrix_controller.handler",
@@ -378,6 +672,7 @@
       }
     },
     "AVXControllerLambdaTrigger": {
+      "DependsOn": "AVXControllerLambda",
       "Type": "Custom::ControllerLamdbdaTrigger",
       "Properties": {
         "ServiceToken": {
@@ -389,7 +684,7 @@
       }
     },
     "AVXGatewayLambda": {
-      "DependsOn": "AVXEIP",
+      "DependsOn": [ "AVXEIP", "AVXRoleAPI","AVXAPIRolePolicy", "AVXKey" ],
       "Type": "AWS::Lambda::Function",
       "Properties": {
         "Handler": "aviatrix_gateway.handler",
@@ -445,6 +740,7 @@
       }
     },
     "AVXGWTopic": {
+      "DependsOn": "AVXGatewayLambda",
       "Type": "AWS::SNS::Topic",
       "Properties": {
         "Subscription": [{
@@ -456,6 +752,7 @@
       }
     },
     "InvokeGWLambda": {
+      "DependsOn": [ "AVXGWTopic", "AVXGatewayLambda" ],
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:InvokeFunction",
@@ -469,6 +766,7 @@
       }
     },
     "AVXPollerLambda": {
+      "DependsOn": [ "AVXGWQueue", "AVXGWTopic" ],
       "Type": "AWS::Lambda::Function",
       "Properties": {
         "Handler": "aviatrix_poller.handler",
@@ -514,6 +812,7 @@
       }
     },
     "AVXPollerEvent": {
+      "DependsOn": "AVXPollerLambda",
       "Type": "AWS::Events::Rule",
       "Properties": {
         "Description": "Rule to trigger AviatrixPoller every 2 minutes to find VPCs that need to be attached to the Transit Hub VPC.",
@@ -530,6 +829,7 @@
       }
     },
     "AVXPollerEventPerm": {
+      "DependsOn": "AVXPollerEvent",
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "FunctionName": {
