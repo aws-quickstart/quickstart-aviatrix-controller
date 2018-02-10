@@ -1,0 +1,850 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Description" : "Aviatrix Systems - Master Stack - Creates the necessary policies, roles, security group and launches Aviatrix Controller instance",
+  "Metadata" :
+  {
+    "AWS::CloudFormation::Interface" :
+    {
+      "ParameterGroups" :
+      [
+        { "Label" : { "default": "Amazon EC2 Configuration" }, "Parameters" : [ "KeyPair" ] },
+        { "Label" : { "default" : "Existing VPC Configuration"}, "Parameters" : [ "VPCID", "PublicSubnet1CIDR", "PublicSubnet1", "PublicSubnet2CIDR", "PublicSubnet2" ] },
+        { "Label" : { "default" : "Controller Information" }, "Parameters" : [ "AdminEmail", "Password", "ControllerSize" ] },
+        { "Label" : { "default" : "Licensing Configuration"}, "Parameters" : [ "LicenseModel", "LicenseKey" ] },
+        { "Label" : { "default" : "Gateway Information" }, "Parameters" : [ "HubGWSize", "SpokeGWSize", "SpokeTag"] },
+        { "Label" : { "default" : "IAM Roles" }, "Parameters" : [ "CreateIamRole" ] },
+        { "Label" : { "default" : "Optional 2nd AWS Account Configuration" }, "Parameters" : [ "OtherAccount", "OtherAccountRoleApp", "OtherAccountRoleEC2"] }
+      ],
+      "ParameterLabels" :
+      {
+        "KeyPair" : { "default" : "Which keypair will be used" },
+        "VPCID": { "default": "VPC ID" },
+        "PublicSubnet1": { "default": "Public Subnet 1" },
+        "PublicSubnet1CIDR": { "default": "Public Subnet 1 CIDR" },
+        "PublicSubnet2": { "default": "Public Subnet 2" },
+        "PublicSubnet2CIDR": { "default": "Public Subnet 2 CIDR" },
+        "AdminEmail" : { "default" : "Administrator email address"},
+        "Password" : { "default" : "Password for admin on Aviatrix Controller " },
+        "ControllerSize" : { "default" : "Aviatrix Controller instance type"},
+        "LicenseModel" : { "default" : "Licensing Model:"},
+        "LicenseKey" :  { "default" : "Enter your license key:"},
+        "HubGWSize" : { "default" : "Aviatrix Hub Gateway instance type" },
+        "SpokeGWSize" : { "default" : "Aviatrix Spoke Gateway instance type" },
+        "SpokeTag" : { "default" : "Spoke VPC Tag Name" },
+        "CreateIamRole" : { "default" : "Create the IAM roles"},
+        "OtherAccount" : { "default" : "Second Account number"},
+        "OtherAccountRoleApp" : { "default" : "ARN for Aviatrix-role-app on secondary account"},
+        "OtherAccountRoleEC2" : { "default" : "ARN for aviatrix-role-ec2 on secondary account"}
+       }
+    }
+  },
+  "Parameters": {
+    "KeyPair": {
+      "Type": "AWS::EC2::KeyPair::KeyName",
+      "Description": "Select your Keypair"
+    },
+    "VPCID": {
+        "Type": "AWS::EC2::VPC::Id"
+    },
+    "PublicSubnet1": {
+        "Type": "AWS::EC2::Subnet::Id"
+    },
+    "PublicSubnet1CIDR": {
+        "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+        "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
+        "Description": "CIDR Block for the public DMZ subnet 1 located in Availability Zone 1",
+        "Type": "String"
+    },
+    "PublicSubnet2": {
+        "Type": "AWS::EC2::Subnet::Id"
+    },
+    "PublicSubnet2CIDR": {
+        "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+        "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
+        "Description": "CIDR Block for the public DMZ subnet 2 located in Availability Zone 2",
+        "Type": "String"
+    },
+    "AdminEmail": {
+      "Type": "String",
+      "Description": " Email of the controller's admin"
+    },
+    "Password": {
+      "Type": "String",
+      "Description": " Password for the controller. Please use a complex password.",
+      "NoEcho": true
+    },
+    "ControllerSize": {
+      "Type" : "String",
+      "Default" : "t2.large",
+      "AllowedValues" : ["t2.large", "m3.medium","m3.large","m3.xlarge","m4.large","m4.xlarge","c4.large","c4.xlarge"],
+      "Description" : "Select an instance size. Default is t2.large."
+    },
+    "LicenseModel" : {
+      "Description" : "Choose between BYOL or License Included - licensing models.",
+      "Type" : "String",
+      "Default" : "LicenseIncluded",
+      "AllowedValues" : [ "LicenseIncluded", "BYOL" ]
+    },
+    "LicenseKey": {
+      "Description" : "If you don't have one, please contact sales@aviatrix.com. For LicenseIncluded leave BLANK",
+      "Type" : "String"
+    },
+    "HubGWSize": {
+      "Type" : "String",
+      "Default" : "t2.medium",
+      "AllowedValues" : ["t2.nano", "t2.micro", "t2.small", "t2.medium", "t2.large", "m3.medium","m3.large","m3.xlarge","m4.large","m4.xlarge","c4.large","c4.xlarge"],
+      "Description" : "Select an instance size. Default is t2.medium."
+    },
+    "SpokeGWSize": {
+      "Type" : "String",
+      "Default" : "t2.micro",
+      "AllowedValues" : ["t2.nano", "t2.micro", "t2.small", "t2.medium", "t2.large", "m3.medium","m3.large","m3.xlarge","m4.large","m4.xlarge","c4.large","c4.xlarge"],
+      "Description" : "Select an instance size. Default is t2.micro."
+    },
+    "SpokeTag" :{
+      "Type" : "String",
+      "Default" : "aviatrix-spoke",
+      "Description" : "Tag to be used to identify spoke VPCs to connect to Transit VPC. Default is aviatrix-spoke."
+    },
+    "CreateIamRole": {
+      "Type" : "String",
+      "Default" : "Yes",
+      "AllowedValues" : ["Yes","No"],
+      "Description" : "Create an IAM roles"
+    },
+    "OtherAccount" : {
+        "Type" : "String",
+        "Default" : "",
+        "Description" : "Enter the number of the secondary AWS account where spokes will be deployed."
+     },
+    "OtherAccountRoleApp" : {
+       "Type" : "String",
+       "Default" : "",
+       "Description" : "Enter the ARN of the aviatrix-role-app on the secondary account where spokes will be deployed."
+    },
+    "OtherAccountRoleEC2" : {
+       "Type" : "String",
+       "Default" : "",
+       "Description" : "Enter the ARN of the Aviatrix-role-ec2 on the secondary account where spokes will be deployed."
+    }
+  },
+  "Conditions" : {
+    "NotBlankLicense" : { "Fn::Not" : [ { "Fn::Equals": [ { "Ref": "LicenseKey" }, "" ] } ] },
+    "GovCloudCondition": {
+            "Fn::Equals": [
+                {
+                    "Ref": "AWS::Region"
+                },
+                "us-gov-west-1"
+            ]
+    },
+    "CreateIamRoleCondition": {
+            "Fn::Equals": [
+                {
+                    "Ref": "CreateIamRole"
+                },
+                "Yes"
+            ]
+    }
+  },
+  "Mappings" : {
+    "RegionMap" : {
+      "us-east-1" : { "LicenseIncluded" : "ami-855463ff",  "BYOL": "ami-db9bb9a1" },
+      "us-east-2" : { "LicenseIncluded" : "ami-9db399f8",  "BYOL": "ami-b40228d1" },
+      "us-west-1" : { "LicenseIncluded" : "ami-ee1b168e",  "BYOL": "ami-2a7e7c4a" },
+      "us-west-2" : { "LicenseIncluded" : "ami-baea56c2",  "BYOL": "ami-fd48f885" },
+      "ca-central-1" : { "LicenseIncluded" : "ami-a90184cd",  "BYOL": "ami-de4bceba" },
+      "eu-central-1" : { "LicenseIncluded" : "ami-49c05926",  "BYOL": "ami-a025b9cf" },
+      "eu-west-1" : { "LicenseIncluded" : "ami-5c99fc25",  "BYOL": "ami-830d93fa" },
+      "eu-west-2" : { "LicenseIncluded" : "ami-c6b7aca2",  "BYOL": "ami-bc253ed8" },
+      "eu-west-3" : { "LicenseIncluded" : "ami-0cd06671",  "BYOL": "ami-f8e35585" },
+      "ap-southeast-1" : { "LicenseIncluded" : "ami-1cfd8460",  "BYOL": "ami-0484f878" },
+      "ap-southeast-2" : { "LicenseIncluded" : "ami-618f7103",  "BYOL": "ami-34728e56" },
+      "ap-northeast-2" : { "LicenseIncluded" : "ami-fdae0d93",  "BYOL": "ami-d902a2b7" },
+      "ap-northeast-1" : { "LicenseIncluded" : "ami-d10163b7",  "BYOL": "ami-2a43244c" },
+      "ap-south-1" : { "LicenseIncluded" : "ami-b65203d9",  "BYOL": "ami-e7560088" },
+      "sa-east-1" : { "LicenseIncluded" : "ami-ba1c50d6",  "BYOL": "ami-404c012c" }
+    }
+  },
+  "Resources" : {
+    "AviatrixRoleEC2" : {
+      "Condition": "CreateIamRoleCondition",
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+         "RoleName": "aviatrix-role-ec2",
+         "AssumeRolePolicyDocument": {
+            "Version" : "2012-10-17",
+            "Statement": [ {
+               "Effect": "Allow",
+               "Principal": {
+                  "Service": [ "ec2.amazonaws.com" ]
+               },
+               "Action": [ "sts:AssumeRole" ]
+            } ]
+         },
+         "Path": "/"
+       }
+    },
+    "AviatrixRoleApp" : {
+      "Condition": "CreateIamRoleCondition",
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+         "RoleName": "aviatrix-role-app",
+         "AssumeRolePolicyDocument": {
+            "Version" : "2012-10-17",
+            "Statement": [ {
+               "Effect": "Allow",
+               "Principal": { "AWS": [ { "Fn::Join" : [ "", [ "arn:aws:iam::", { "Ref" : "AWS::AccountId" } , ":root" ] ] } ] },
+               "Action": [ "sts:AssumeRole" ]
+            } ]
+         },
+         "Path": "/"
+       }
+    },
+    "CreateAviatrixAssumeRolePolicy" : {
+      "Condition": "CreateIamRoleCondition",
+      "DependsOn": [ "AviatrixRoleEC2", "AviatrixRoleApp" ],
+      "Type" : "AWS::IAM::ManagedPolicy",
+      "Properties" :
+      {
+        "ManagedPolicyName" : "aviatrix-assume-role-policy",
+        "Description" : "Policy for creating aviatrix-assume-role-policy",
+        "Path" : "/",
+        "PolicyDocument" :
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+              {
+                  "Effect": "Allow",
+
+            "Action": [
+                      "iam:UpdateAssumeRolePolicy",
+                      "sts:AssumeRole"
+                  ],
+                  "Resource": "arn:aws:iam::*"
+              }
+          ]
+        },
+        "Roles" :
+        [ {
+          "Ref": "AviatrixRoleEC2"
+        } ]
+      }
+    },
+    "CreateAviatrixAppPolicy" : {
+      "Condition": "CreateIamRoleCondition",
+      "DependsOn": [ "AviatrixRoleEC2", "AviatrixRoleApp" ],
+      "Type" : "AWS::IAM::ManagedPolicy",
+      "Properties" :
+      {
+        "ManagedPolicyName" : "aviatrix-app-policy",
+        "Description" : "Policy for creating aviatrix-app-policy",
+        "Path" : "/",
+        "PolicyDocument" :
+        {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "ec2:Describe*",
+                        "elasticloadbalancing:Describe*",
+                        "route53:List*",
+                        "route53:Get*",
+                        "sqs:Get*",
+                        "sqs:List*",
+                        "sns:List*",
+                        "s3:List*",
+                        "s3:Get*",
+                        "iam:List*",
+                        "iam:Get*"
+                    ],
+                    "Resource": "*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "ec2:RunInstances"
+                    ],
+                    "Resource": "*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": "ec2:RunInstances",
+                    "Resource": "arn:aws:ec2:*:*:image/ami-*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "ec2:DeleteSecurityGroup",
+                        "ec2:RevokeSecurityGroupEgress",
+                        "ec2:RevokeSecurityGroupIngress",
+                        "ec2:AuthorizeSecurityGroup*",
+                        "ec2:CreateSecurityGroup",
+                        "ec2:AssociateRouteTable",
+                        "ec2:CreateRoute",
+                        "ec2:CreateRouteTable",
+                        "ec2:DeleteRoute",
+                        "ec2:DeleteRouteTable",
+                        "ec2:DisassociateRouteTable",
+                        "ec2:ReplaceRoute",
+                        "ec2:ReplaceRouteTableAssociation"
+                    ],
+                    "Resource": "*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "ec2:AllocateAddress",
+                        "ec2:AssociateAddress",
+                        "ec2:DisassociateAddress",
+                        "ec2:ReleaseAddress",
+                        "ec2:AssignPrivateIpAddresses",
+                        "ec2:AttachNetworkInterface",
+                        "ec2:CreateNetworkInterface",
+                        "ec2:DeleteNetworkInterface",
+                        "ec2:DetachNetworkInterface",
+                        "ec2:ModifyNetworkInterfaceAttribute",
+                        "ec2:ResetNetworkInterfaceAttribute",
+                        "ec2:UnassignPrivateIpAddresses",
+                        "ec2:ModifyInstanceAttribute",
+                        "ec2:MonitorInstances",
+                        "ec2:RebootInstances",
+                        "ec2:ReportInstanceStatus",
+                        "ec2:ResetInstanceAttribute",
+                        "ec2:StartInstances",
+                        "ec2:StopInstances",
+                        "ec2:TerminateInstances",
+                        "ec2:UnmonitorInstances",
+                        "ec2:AttachInternetGateway",
+                        "ec2:CreateInternetGateway",
+                        "ec2:DeleteInternetGateway",
+                        "ec2:DetachInternetGateway",
+                        "ec2:CreateKeyPair",
+                        "ec2:DeleteKeyPair",
+                        "ec2:CreateSubnet",
+                        "ec2:DeleteSubnet",
+                        "ec2:ModifySubnetAttribute",
+                        "ec2:CreateTags",
+                        "ec2:DeleteTags",
+                        "ec2:CreateVpc",
+                        "ec2:DeleteVpc",
+                        "ec2:ModifyVpcAttribute",
+                        "ec2:CreateCustomerGateway",
+                        "ec2:DeleteCustomerGateway",
+                        "ec2:CreateVpnConnection",
+                        "ec2:DeleteVpnConnection",
+                        "ec2:CreateVpcPeeringConnection",
+                        "ec2:AcceptVpcPeeringConnection",
+                        "ec2:DeleteVpcPeeringConnection"
+                    ],
+                    "Resource": "*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "elasticloadbalancing:ApplySecurityGroupsToLoadBalancer",
+                        "elasticloadbalancing:AttachLoadBalancerToSubnets",
+                        "elasticloadbalancing:ConfigureHealthCheck",
+                        "elasticloadbalancing:CreateLoadBalancer*",
+                        "elasticloadbalancing:DeleteLoadBalancer*",
+                        "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+                        "elasticloadbalancing:ModifyLoadBalancerAttributes",
+                        "elasticloadbalancing:SetLoadBalancerPoliciesForBackendServer",
+                        "elasticloadbalancing:RegisterInstancesWithLoadBalancer"
+                    ],
+                    "Resource": "*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "route53:ChangeResourceRecordSets",
+                        "route53:CreateHostedZone",
+                        "route53:DeleteHostedZone"
+                    ],
+                    "Resource": "*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "s3:CreateBucket",
+                        "s3:DeleteBucket",
+                        "s3:PutObject",
+                        "s3:DeleteObject"
+                    ],
+                    "Resource": "*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "sqs:AddPermission",
+                        "sqs:ChangeMessageVisibility",
+                        "sqs:CreateQueue",
+                        "sqs:DeleteMessage",
+                        "sqs:DeleteQueue",
+                        "sqs:PurgeQueue",
+                        "sqs:ReceiveMessage",
+                        "sqs:RemovePermission",
+                        "sqs:SendMessage",
+                        "sqs:SetQueueAttributes"
+                    ],
+                    "Resource": "*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "sts:AssumeRole"
+                    ],
+                    "Resource": "arn:aws:iam::*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "iam:PassRole",
+                        "iam:AddRoleToInstanceProfile",
+                        "iam:CreateInstanceProfile",
+                        "iam:DeleteInstanceProfile",
+                        "iam:RemoveRoleFromInstanceProfile"
+                    ],
+                    "Resource": "*"
+                }
+            ]
+        },
+        "Roles" :
+        [ {
+          "Ref": "AviatrixRoleApp"
+        } ]
+      }
+    },
+    "AviatrixInstanceProfile": {
+      "Condition": "CreateIamRoleCondition",
+      "DependsOn": [ "AviatrixRoleEC2", "CreateAviatrixAssumeRolePolicy", "CreateAviatrixAppPolicy" ],
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "InstanceProfileName": "aviatrix-role-ec2",
+        "Path": "/",
+        "Roles": [ "aviatrix-role-ec2" ]
+      }
+    },
+
+    "WaitHandle": {
+    	"Type" : "AWS::CloudFormation::WaitConditionHandle",
+   		"Properties" : {}
+    },
+    "IamRoleWaitHandle": {
+    	"DependsOn": [ "AviatrixRoleEC2", "AviatrixRoleApp", "CreateAviatrixAssumeRolePolicy", "CreateAviatrixAppPolicy", "AviatrixInstanceProfile" ],
+    	"Condition": "CreateIamRoleCondition",
+    	"Type" : "AWS::CloudFormation::WaitConditionHandle",
+   		"Properties" : {}
+    },
+    "WaitCondition": {
+    	"Type" : "AWS::CloudFormation::WaitCondition",
+    	"Properties" : {
+	      "Count" : 0,
+	      "Handle" : {"Fn::If": ["CreateIamRoleCondition", {"Ref": "IamRoleWaitHandle"}, {"Ref": "WaitHandle"}]},
+	      "Timeout" : 1
+   		}
+    },
+
+    "AVXSG": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Aviatrix - Allow HTTPS to Controller",
+        "VpcId":  { "Ref" :  "VPCID" } ,
+        "SecurityGroupIngress": [ {
+          "IpProtocol": "tcp",
+          "CidrIp": "0.0.0.0/0",
+          "FromPort": "443",
+          "ToPort": "443"
+        } ],
+        "Tags": [
+          { "Key": "Name", "Value": "Aviatrix Security Group" },
+          { "Key": "Project", "Value": "Aviatrix" },
+          { "Key": "CreatedUsing", "Value": "Aviatrix Quickstart" }
+        ]
+      }
+    },
+    "AVXController" : {
+      "DependsOn" : [ "AVXSG", "WaitCondition" ],
+      "Type" : "AWS::EC2::Instance",
+      "Properties" : {
+        "ImageId" : { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, { "Ref": "LicenseModel" } ] },
+        "KeyName" : { "Ref": "KeyPair" },
+        "InstanceType": { "Ref" : "ControllerSize" },
+        "IamInstanceProfile" : "aviatrix-role-ec2",
+        "NetworkInterfaces": [ {
+          "DeviceIndex": "0",
+          "GroupSet": [ { "Ref" : "AVXSG" } ],
+          "SubnetId": { "Ref" : "PublicSubnet1" }
+        } ],
+        "Tags": [
+          { "Key": "Name", "Value": "Aviatrix Controller" },
+          { "Key": "Project", "Value": "Aviatrix" },
+          { "Key": "CreatedUsing", "Value": "Aviatrix Quickstart" }
+        ]
+      }
+    },
+    "AVXEIP": {
+      "DependsOn" : "AVXController",
+      "Type": "AWS::EC2::EIP",
+      "Properties" : {
+        "InstanceId" : {"Ref":  "AVXController" }
+      }
+    },
+
+    "AVXRoleAPI": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [{
+            "Effect": "Allow",
+            "Principal": {
+              "Service": [
+                "lambda.amazonaws.com",
+                "edgelambda.amazonaws.com"
+              ]
+            },
+            "Action": ["sts:AssumeRole"]
+          }]
+        },
+        "Path": "/"
+      }
+    },
+    "AVXAPIRolePolicy": {
+      "DependsOn": [ "AVXRoleAPI" ],
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "Description": "Policy for creating aviatrix-api-role-policy",
+        "Path": "/",
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [{
+            "Effect": "Allow",
+            "Action": [
+              "logs:CreateLogGroup",
+              "logs:CreateLogStream",
+              "logs:PutLogEvents",
+              "ec2:Describe*",
+              "ec2:CreateTags",
+              "SNS:Publish",
+              "STS:AssumeRole"
+            ],
+            "Resource": "*"
+          }]
+        },
+        "Roles": [{
+          "Ref": "AVXRoleAPI"
+        }]
+      }
+    },
+
+    "AVXKey": {
+      "DependsOn": "AVXRoleAPI",
+      "Type": "AWS::KMS::Key",
+      "Properties": {
+        "Description": "Key to encrypt Aviatrix Data",
+        "KeyPolicy": {
+          "Version": "2012-10-17",
+          "Id": "key-default-1",
+          "Statement": [ {
+              "Sid": "Enable IAM User Permissions",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": [
+                  { "Fn::Join": [ "", [ "arn:aws:iam::", { "Ref": "AWS::AccountId" }, ":root" ] ] }
+                ]
+              },
+              "Action": "kms:*",
+              "Resource": "*"
+            },
+            {
+              "Sid": "Allow use of the key",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": [
+                  { "Fn::GetAtt": [ "AVXRoleAPI", "Arn" ] }
+                ]
+              },
+              "Action": [
+                "kms:Encrypt",
+                "kms:Decrypt",
+                "kms:ReEncrypt*",
+                "kms:GenerateDataKey*",
+                "kms:DescribeKey"
+              ],
+              "Resource": "*"
+            }
+          ]
+        }
+      }
+    },
+    "AVXGWQueue": {
+      "Type": "AWS::SQS::Queue"
+    },
+    "AVXControllerLambda": {
+      "DependsOn": [ "AVXEIP", "AVXRoleAPI", "AVXAPIRolePolicy", "AVXKey", "AVXGWQueue", "AVXGWTopic" ],
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Handler": "aviatrix_controller.handler",
+        "Role": {
+          "Fn::GetAtt": [ "AVXRoleAPI", "Arn" ]
+        },
+        "Code": {
+          "S3Bucket": {
+            "Fn::Join": [ "", [ "quickstart-aviatrix-", { "Ref": "AWS::Region" } ] ]
+          },
+          "S3Key": "quickstart-aviatrix/scripts/aviatrix_controller.py.zip"
+        },
+        "KmsKeyArn": {
+          "Fn::GetAtt": [ "AVXKey", "Arn" ]
+        },
+        "Environment": {
+          "Variables": {
+            "Controller_IP": {
+              "Fn::GetAtt" : [ "AVXController" , "PublicIp" ]
+            },
+            "Username": "admin",
+            "Private_IP": {
+              "Fn::GetAtt" : [ "AVXController" , "PrivateIp" ]
+            },
+            "Admin_Email": {
+              "Ref": "AdminEmail"
+            },
+            "Password": {
+              "Ref": "Password"
+            },
+            "Account": {
+              "Ref": "AWS::AccountId"
+            },
+            "AviatrixRoleApp": {
+              "Fn::Join": [ "", [ "arn:aws:iam::", { "Ref": "AWS::AccountId" }, ":role/aviatrix-role-app" ] ]
+            },
+            "AviatrixRoleEC2": {
+              "Fn::Join": [ "", [ "arn:aws:iam::", { "Ref": "AWS::AccountId" }, ":role/aviatrix-role-ec2" ] ]
+            },
+            "VPC": {
+              "Ref" :  "VPCID"
+            },
+            "Subnet": {
+              "Ref": "PublicSubnet1CIDR"
+            },
+            "SubnetHA": {
+              "Ref": "PublicSubnet2CIDR"
+            },
+            "Region": {
+              "Ref": "AWS::Region"
+            },
+            "HubGWSize": {
+              "Ref": "HubGWSize"
+            },
+            "SpokeGWSize": {
+              "Ref": "SpokeGWSize"
+            },
+            "GatewayQueue": {
+              "Fn::GetAtt": ["AVXGWQueue", "QueueName"]
+            },
+            "GatewayQueueURL": {
+              "Ref": "AVXGWQueue"
+            },
+            "GatewayTopic": {
+              "Ref": "AVXGWTopic"
+            },
+            "OtherAccount": {
+              "Ref": "OtherAccount"
+            },
+            "OtherAccountRoleApp": {
+              "Ref": "OtherAccountRoleApp"
+            },
+            "OtherAccountRoleEC2": {
+              "Ref": "OtherAccountRoleEC2"
+            },
+            "LicenseModel" : {
+              "Ref": "LicenseModel"
+            },
+            "License" : {
+              "Ref": "LicenseKey"
+            }
+          }
+        },
+        "Runtime": "python3.6",
+        "Timeout": "300"
+      }
+    },
+    "AVXControllerLambdaTrigger": {
+      "DependsOn": "AVXControllerLambda",
+      "Type": "Custom::ControllerLamdbdaTrigger",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "AVXControllerLambda",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "AVXGatewayLambda": {
+      "DependsOn": [ "AVXEIP", "AVXRoleAPI","AVXAPIRolePolicy", "AVXKey" ],
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Handler": "aviatrix_gateway.handler",
+        "Role": {
+          "Fn::GetAtt": [ "AVXRoleAPI", "Arn" ]
+        },
+        "Code": {
+          "S3Bucket": {
+            "Fn::Join": [ "", [ "quickstart-aviatrix-", { "Ref": "AWS::Region" } ] ]
+          },
+          "S3Key": "quickstart-aviatrix/scripts/aviatrix_gateway.py.zip"
+        },
+        "KmsKeyArn": {
+          "Fn::GetAtt": [ "AVXKey", "Arn" ]
+        },
+        "Environment": {
+          "Variables": {
+            "Controller_IP": {
+              "Fn::GetAtt" : [ "AVXController" , "PublicIp" ]
+            },
+            "Username": "admin",
+            "Password": {
+              "Ref": "Password"
+            },
+            "VPC": {
+              "Ref" : "VPCID"
+            },
+            "Region": {
+              "Ref": "AWS::Region"
+            },
+            "HubGWSize": {
+              "Ref": "HubGWSize"
+            },
+            "SpokeGWSize": {
+              "Ref": "SpokeGWSize"
+            },
+            "SpokeTag": {
+              "Ref": "SpokeTag"
+            },
+            "OtherAccountRoleApp": {
+              "Ref": "OtherAccountRoleApp"
+            },
+            "GatewayQueue": {
+              "Fn::GetAtt": ["AVXGWQueue", "QueueName"]
+            },
+            "GatewayQueueURL": {
+              "Ref": "AVXGWQueue"
+            }
+          }
+        },
+        "Runtime": "python3.6",
+        "Timeout": "300"
+      }
+    },
+    "AVXGWTopic": {
+      "DependsOn": "AVXGatewayLambda",
+      "Type": "AWS::SNS::Topic",
+      "Properties": {
+        "Subscription": [{
+          "Endpoint": {
+            "Fn::GetAtt": [ "AVXGatewayLambda", "Arn" ]
+          },
+          "Protocol": "lambda"
+        }]
+      }
+    },
+    "InvokeGWLambda": {
+      "DependsOn": [ "AVXGWTopic", "AVXGatewayLambda" ],
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "Principal": "sns.amazonaws.com",
+        "SourceArn": {
+          "Ref": "AVXGWTopic"
+        },
+        "FunctionName": {
+          "Fn::GetAtt": [ "AVXGatewayLambda", "Arn" ]
+        }
+      }
+    },
+    "AVXPollerLambda": {
+      "DependsOn": [ "AVXGWQueue", "AVXGWTopic" ],
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Handler": "aviatrix_poller.handler",
+        "Role": {
+          "Fn::GetAtt": [ "AVXRoleAPI", "Arn" ]
+        },
+        "Code": {
+          "S3Bucket": {
+            "Fn::Join": [ "", [ "quickstart-aviatrix-", { "Ref": "AWS::Region" } ] ]
+          },
+          "S3Key": "quickstart-aviatrix/scripts/aviatrix_poller.py.zip"
+        },
+        "KmsKeyArn": {
+          "Fn::GetAtt": [ "AVXKey", "Arn" ]
+        },
+        "Environment": {
+          "Variables": {
+            "GatewayQueue": {
+              "Fn::GetAtt": [ "AVXGWQueue", "QueueName" ]
+            },
+            "GatewayQueueURL": {
+              "Ref": "AVXGWQueue"
+            },
+            "HubVPC": {
+              "Ref" : "VPCID"
+            },
+            "SpokeGWSize": {
+              "Ref": "SpokeGWSize"
+            },
+            "SpokeTag": {
+              "Ref": "SpokeTag"
+            },
+            "OtherAccountRoleApp": {
+              "Ref": "OtherAccountRoleApp"
+            },
+            "GatewayTopic": {
+              "Ref": "AVXGWTopic"
+            }
+          }
+        },
+        "Runtime": "python3.6",
+        "Timeout": "300"
+      }
+    },
+    "AVXPollerEvent": {
+      "DependsOn": "AVXPollerLambda",
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "Description": "Rule to trigger AviatrixPoller every 2 minutes to find VPCs that need to be attached to the Transit Hub VPC.",
+        "ScheduleExpression": "cron(/2 * * * ? *)",
+        "State": "ENABLED",
+        "Targets": [ {
+          "Id": {
+            "Fn::Join": [ "-", [ { "Ref": "AWS::StackName" }, "Poller-2min" ] ]
+          },
+          "Arn": {
+            "Fn::GetAtt": [ "AVXPollerLambda", "Arn" ]
+          }
+        } ]
+      }
+    },
+    "AVXPollerEventPerm": {
+      "DependsOn": "AVXPollerEvent",
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "AVXPollerLambda"
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [ "AVXPollerEvent", "Arn" ]
+        }
+      }
+    }
+  },
+  "Outputs" : {
+    "AviatrixControllerEIP" : { "Description": "AviatrixController External IP", "Value" : { "Fn::GetAtt" : [ "AVXController" , "PublicIp" ] } },
+    "AviatrixControllerPrivateIP" : { "Description": "AviatrixController Private IP", "Value" : { "Fn::GetAtt" : [ "AVXController" , "PrivateIp" ] } }
+  }
+}
