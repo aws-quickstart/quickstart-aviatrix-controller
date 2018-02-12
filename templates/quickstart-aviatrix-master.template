@@ -13,7 +13,8 @@
         { "Label" : { "default" : "Licensing Configuration"}, "Parameters" : [ "LicenseModel", "LicenseKey" ] },
         { "Label" : { "default" : "Gateway Information" }, "Parameters" : [ "HubGWSize", "SpokeGWSize", "SpokeTag"] },
         { "Label" : { "default" : "IAM Roles" }, "Parameters" : [ "CreateIamRole" ] },
-        { "Label" : { "default" : "Optional 2nd AWS Account Configuration" }, "Parameters" : [ "OtherAccount", "OtherAccountRoleApp", "OtherAccountRoleEC2"] }
+        { "Label" : { "default" : "Optional 2nd AWS Account Configuration" }, "Parameters" : [ "OtherAccount", "OtherAccountRoleApp", "OtherAccountRoleEC2"] },
+        { "Label" : { "default": "AWS Quick Start Configuration" }, "Parameters": [ "QSS3BucketName", "QSS3KeyPrefix" ] }
       ],
       "ParameterLabels" :
       {
@@ -33,7 +34,9 @@
         "CreateIamRole" : { "default" : "Create the IAM roles"},
         "OtherAccount" : { "default" : "Second Account number"},
         "OtherAccountRoleApp" : { "default" : "ARN for Aviatrix-role-app on secondary account"},
-        "OtherAccountRoleEC2" : { "default" : "ARN for aviatrix-role-ec2 on secondary account"}
+        "OtherAccountRoleEC2" : { "default" : "ARN for aviatrix-role-ec2 on secondary account"},
+        "QSS3BucketName": { "default": "Quick Start S3 Bucket Name" },
+        "QSS3KeyPrefix": { "default": "Quick Start S3 Key Prefix" }
        }
     }
   },
@@ -79,7 +82,7 @@
     "ControllerSize": {
       "Type" : "String",
       "Default" : "t2.large",
-      "AllowedValues" : ["t2.large", "m3.medium","m3.large","m3.xlarge","m4.large","m4.xlarge","c4.large","c4.xlarge"],
+      "AllowedValues" : ["t2.large", "m3.medium","m3.large","m3.xlarge","c4.large","c4.xlarge" "c4.2xlarge"],
       "Description" : "Select an instance size. Default is t2.large."
     },
     "LicenseModel" : {
@@ -95,13 +98,13 @@
     "HubGWSize": {
       "Type" : "String",
       "Default" : "t2.medium",
-      "AllowedValues" : ["t2.nano", "t2.micro", "t2.small", "t2.medium", "t2.large", "m3.medium","m3.large","m3.xlarge","m4.large","m4.xlarge","c4.large","c4.xlarge"],
+      "AllowedValues" : [ "t2.micro", "t2.small", "t2.medium", "t2.large", "m3.medium","m3.large","m3.xlarge","m4.large","m4.xlarge","c4.large","c4.xlarge"],
       "Description" : "Select an instance size. Default is t2.medium."
     },
     "SpokeGWSize": {
       "Type" : "String",
       "Default" : "t2.micro",
-      "AllowedValues" : ["t2.nano", "t2.micro", "t2.small", "t2.medium", "t2.large", "m3.medium","m3.large","m3.xlarge","m4.large","m4.xlarge","c4.large","c4.xlarge"],
+      "AllowedValues" : [ "t2.micro", "t2.small", "t2.medium", "t2.large", "m3.medium","m3.large","m3.xlarge","m4.large","m4.xlarge","c4.large","c4.xlarge"],
       "Description" : "Select an instance size. Default is t2.micro."
     },
     "SpokeTag" :{
@@ -129,7 +132,21 @@
        "Type" : "String",
        "Default" : "",
        "Description" : "Enter the ARN of the Aviatrix-role-ec2 on the secondary account where spokes will be deployed."
-    }
+    },
+    "QSS3BucketName": {
+      "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
+      "ConstraintDescription": "Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+      "Default": "quickstart-reference",
+      "Description": "S3 bucket name for the Quick Start assets. Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+      "Type": "String"
+     },
+    "QSS3KeyPrefix": {
+       "AllowedPattern": "^[0-9a-zA-Z-/]*$",
+       "ConstraintDescription": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).",
+       "Default": "microsoft/activedirectory/latest/",
+       "Description": "S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).",
+       "Type": "String"
+     }
   },
   "Conditions" : {
     "NotBlankLicense" : { "Fn::Not" : [ { "Fn::Equals": [ { "Ref": "LicenseKey" }, "" ] } ] },
@@ -167,7 +184,7 @@
         "Properties": {
             "TemplateURL": {
                 "Fn::Sub": [
-                    "https://s3.amazonaws.com/quickstart-aviatrix-us-east-1/quickstart-aviatrix/submodules/quickstart-aws-vpc/templates/aws-vpc.template",
+                    "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-aws-vpc/templates/aws-vpc.template",
                     {
                         "QSS3Region": {
                             "Fn::If": [
