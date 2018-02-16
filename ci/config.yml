@@ -10,5 +10,5 @@ tests:
     #   parameter_input: quickstart-aviatrix-params.json
     #   template_file: quickstart-aviatrix.template
   quickstart-aviatrix-master:
-    parameter_input: quickstart-aviatrix-master-params.json
-    template_file: quickstart-aviatrix-master.template
+    parameter_input: quickstart-aviatrix--nggth-master-params.json
+    template_file: quickstart-aviatrix-nggth-master.template
