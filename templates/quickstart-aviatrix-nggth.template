@@ -7,8 +7,8 @@
     {
       "ParameterGroups" :
       [
+        { "Label" : { "default" : "Network Configuration"}, "Parameters" : [ "VPCID", "PublicSubnet1CIDR", "PublicSubnet1", "PublicSubnet2CIDR", "PublicSubnet2" ] },
         { "Label" : { "default": "Amazon EC2 Configuration" }, "Parameters" : [ "KeyPair" ] },
-        { "Label" : { "default" : "Existing VPC Configuration"}, "Parameters" : [ "VPCID", "PublicSubnet1CIDR", "PublicSubnet1", "PublicSubnet2CIDR", "PublicSubnet2" ] },
         { "Label" : { "default" : "Controller Information" }, "Parameters" : [ "AdminEmail", "Password", "ControllerSize" ] },
         { "Label" : { "default" : "Licensing Configuration"}, "Parameters" : [ "LicenseModel", "LicenseKey" ] },
         { "Label" : { "default" : "Gateway Information" }, "Parameters" : [ "HubGWSize", "SpokeGWSize", "SpokeTag"] },
@@ -18,14 +18,14 @@
       ],
       "ParameterLabels" :
       {
-        "KeyPair" : { "default" : "Which keypair will be used" },
+        "KeyPair" : { "default" : "Keypair" },
         "VPCID": { "default": "VPC ID" },
         "PublicSubnet1": { "default": "Public Subnet 1" },
         "PublicSubnet1CIDR": { "default": "Public Subnet 1 CIDR" },
         "PublicSubnet2": { "default": "Public Subnet 2" },
         "PublicSubnet2CIDR": { "default": "Public Subnet 2 CIDR" },
         "AdminEmail" : { "default" : "Administrator email address"},
-        "Password" : { "default" : "Password for admin on Aviatrix Controller " },
+        "Password" : { "default" : "Aviatrix Controller Admin Password" },
         "ControllerSize" : { "default" : "Aviatrix Controller instance type"},
         "LicenseModel" : { "default" : "Licensing Model:"},
         "LicenseKey" :  { "default" : "Enter your license key:"},
@@ -44,13 +44,15 @@
   "Parameters": {
     "KeyPair": {
       "Type": "AWS::EC2::KeyPair::KeyName",
-      "Description": "Select your Keypair"
+      "Description": "Select instance Keypair"
     },
     "VPCID": {
-        "Type": "AWS::EC2::VPC::Id"
+        "Type": "AWS::EC2::VPC::Id",
+        "Description": "VPC Id"
     },
     "PublicSubnet1": {
-        "Type": "AWS::EC2::Subnet::Id"
+        "Type": "AWS::EC2::Subnet::Id",
+        "Description": "Public subnet 1 Id"
     },
     "PublicSubnet1CIDR": {
         "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
@@ -59,7 +61,8 @@
         "Type": "String"
     },
     "PublicSubnet2": {
-        "Type": "AWS::EC2::Subnet::Id"
+        "Type": "AWS::EC2::Subnet::Id",
+        "Description": "Public subnet 2 Id"
     },
     "PublicSubnet2CIDR": {
         "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
@@ -80,7 +83,7 @@
       "Type" : "String",
       "Default" : "t2.large",
       "AllowedValues" : ["t2.large", "m3.medium","m3.large","m3.xlarge","c4.large","c4.xlarge", "c4.2xlarge"],
-      "Description" : "Select an instance size. Default is t2.large."
+      "Description" : "Select an instance size."
     },
     "LicenseModel" : {
       "Description" : "Choose between BYOL or License Included - licensing models.",
@@ -89,20 +92,20 @@
       "AllowedValues" : [ "LicenseIncluded", "BYOL" ]
     },
     "LicenseKey": {
-      "Description" : "If you don't have one, please contact sales@aviatrix.com. For LicenseIncluded leave BLANK",
+      "Description" : "(Optional) Needed only if you select BYOL abvoe. If you don't have license key, please contact sales@aviatrix.com. For LicenseIncluded license model, leave BLANK",
       "Type" : "String"
     },
     "HubGWSize": {
       "Type" : "String",
       "Default" : "t2.medium",
       "AllowedValues" : [ "t2.micro", "t2.small", "t2.medium", "t2.large", "m3.medium","m3.large","m3.xlarge","m4.large","m4.xlarge","c4.large","c4.xlarge"],
-      "Description" : "Select an instance size. Default is t2.medium."
+      "Description" : "Select an instance size."
     },
     "SpokeGWSize": {
       "Type" : "String",
       "Default" : "t2.micro",
       "AllowedValues" : [ "t2.micro", "t2.small", "t2.medium", "t2.large", "m3.medium","m3.large","m3.xlarge","m4.large","m4.xlarge","c4.large","c4.xlarge"],
-      "Description" : "Select an instance size. Default is t2.micro."
+      "Description" : "Select an instance size."
     },
     "SpokeTag" :{
       "Type" : "String",
@@ -113,12 +116,12 @@
       "Type" : "String",
       "Default" : "Yes",
       "AllowedValues" : ["Yes","No"],
-      "Description" : "Create an IAM roles"
+      "Description" : "Create an IAM role"
     },
     "OtherAccount" : {
         "Type" : "String",
         "Default" : "",
-        "Description" : "Enter the number of the secondary AWS account where spokes will be deployed."
+        "Description" : "Enter the account number of the secondary AWS account where spokes will be deployed."
      },
     "OtherAccountRoleApp" : {
        "Type" : "String",
@@ -133,14 +136,14 @@
     "QSS3BucketName": {
       "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
       "ConstraintDescription": "Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
-      "Default": "aviatrix-cft-us-east-1",
+      "Default": "quickstart-reference",
       "Description": "S3 bucket name for the Quick Start assets. Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
       "Type": "String"
      },
     "QSS3KeyPrefix": {
        "AllowedPattern": "^[0-9a-zA-Z-/]*$",
        "ConstraintDescription": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).",
-       "Default": "quickstart-aviatrix-nggth/",
+       "Default": "aviatrix/latest/",
        "Description": "S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).",
        "Type": "String"
      }
@@ -166,22 +169,34 @@
     }
   },
   "Mappings" : {
-    "RegionMap" : {
-      "us-east-1" : { "LicenseIncluded" : "ami-855463ff",  "BYOL": "ami-db9bb9a1" },
-      "us-east-2" : { "LicenseIncluded" : "ami-9db399f8",  "BYOL": "ami-b40228d1" },
-      "us-west-1" : { "LicenseIncluded" : "ami-ee1b168e",  "BYOL": "ami-2a7e7c4a" },
-      "us-west-2" : { "LicenseIncluded" : "ami-baea56c2",  "BYOL": "ami-fd48f885" },
-      "ca-central-1" : { "LicenseIncluded" : "ami-a90184cd",  "BYOL": "ami-de4bceba" },
-      "eu-central-1" : { "LicenseIncluded" : "ami-49c05926",  "BYOL": "ami-a025b9cf" },
-      "eu-west-1" : { "LicenseIncluded" : "ami-5c99fc25",  "BYOL": "ami-830d93fa" },
-      "eu-west-2" : { "LicenseIncluded" : "ami-c6b7aca2",  "BYOL": "ami-bc253ed8" },
-      "eu-west-3" : { "LicenseIncluded" : "ami-0cd06671",  "BYOL": "ami-f8e35585" },
-      "ap-southeast-1" : { "LicenseIncluded" : "ami-1cfd8460",  "BYOL": "ami-0484f878" },
-      "ap-southeast-2" : { "LicenseIncluded" : "ami-618f7103",  "BYOL": "ami-34728e56" },
-      "ap-northeast-2" : { "LicenseIncluded" : "ami-fdae0d93",  "BYOL": "ami-d902a2b7" },
-      "ap-northeast-1" : { "LicenseIncluded" : "ami-d10163b7",  "BYOL": "ami-2a43244c" },
-      "ap-south-1" : { "LicenseIncluded" : "ami-b65203d9",  "BYOL": "ami-e7560088" },
-      "sa-east-1" : { "LicenseIncluded" : "ami-ba1c50d6",  "BYOL": "ami-404c012c" }
+    "AWSAMIRegionMap" : {
+      "AMI": {
+        "AVIATRIXLI": "aviatrix_cloud_services_gateway_111517_100_tunnel-b4ad3e0e-f165-4cc6-9914-175c7ff20910-ami-6b6f1711.4",
+        "AVIATRIXBYOL": "aviatrix_cloud_services_gateway_111517_BYOL-109cd06c-210a-4fa4-839b-708683c66dc6-ami-b38d38c9.4"
+    },
+    "us-east-1" : { "AVIATRIXLI" : "ami-855463ff",  "AVIATRIXBYOL": "ami-db9bb9a1" },
+      "us-east-2" : { "AVIATRIXLI" : "ami-9db399f8",  "AVIATRIXBYOL": "ami-b40228d1" },
+      "us-west-1" : { "AVIATRIXLI" : "ami-ee1b168e",  "AVIATRIXBYOL": "ami-2a7e7c4a" },
+      "us-west-2" : { "AVIATRIXLI" : "ami-baea56c2",  "AVIATRIXBYOL": "ami-fd48f885" },
+      "ca-central-1" : { "AVIATRIXLI" : "ami-a90184cd",  "AVIATRIXBYOL": "ami-de4bceba" },
+      "eu-central-1" : { "AVIATRIXLI" : "ami-49c05926",  "AVIATRIXBYOL": "ami-a025b9cf" },
+      "eu-west-1" : { "AVIATRIXLI" : "ami-5c99fc25",  "AVIATRIXBYOL": "ami-830d93fa" },
+      "eu-west-2" : { "AVIATRIXLI" : "ami-c6b7aca2",  "AVIATRIXBYOL": "ami-bc253ed8" },
+      "eu-west-3" : { "AVIATRIXLI" : "ami-0cd06671",  "AVIATRIXBYOL": "ami-f8e35585" },
+      "ap-southeast-1" : { "AVIATRIXLI" : "ami-1cfd8460",  "AVIATRIXBYOL": "ami-0484f878" },
+      "ap-southeast-2" : { "AVIATRIXLI" : "ami-618f7103",  "AVIATRIXBYOL": "ami-34728e56" },
+      "ap-northeast-2" : { "AVIATRIXLI" : "ami-fdae0d93",  "AVIATRIXBYOL": "ami-d902a2b7" },
+      "ap-northeast-1" : { "AVIATRIXLI" : "ami-d10163b7",  "AVIATRIXBYOL": "ami-2a43244c" },
+      "ap-south-1" : { "AVIATRIXLI" : "ami-b65203d9",  "AVIATRIXBYOL": "ami-e7560088" },
+      "sa-east-1" : { "AVIATRIXLI" : "ami-ba1c50d6",  "AVIATRIXBYOL": "ami-404c012c" }
+    },
+    "AMINameMap": {
+        "LicenseIncluded": {
+            "Code": "AVIATRIXLI"
+        },
+        "BYOL": {
+            "Code": "AVIATRIXBYOL"
+        }
     }
   },
   "Resources" : {
@@ -486,7 +501,21 @@
       "DependsOn" : [ "AVXSG", "WaitCondition" ],
       "Type" : "AWS::EC2::Instance",
       "Properties" : {
-        "ImageId" : { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, { "Ref": "LicenseModel" } ] },
+        "ImageId" : { 
+        	"Fn::FindInMap" : [ 
+	        	"AWSAMIRegionMap", 
+	        	{ "Ref" : "AWS::Region" },
+	        	{
+	                "Fn::FindInMap": [
+	                    "AMINameMap",
+	                    {
+	                        "Ref": "LicenseModel"
+	                    },
+	                    "Code"
+	                ]
+	            }
+    		] 
+		},
         "KeyName" : { "Ref": "KeyPair" },
         "InstanceType": { "Ref" : "ControllerSize" },
         "IamInstanceProfile" : "aviatrix-role-ec2",
@@ -815,7 +844,7 @@
           "S3Bucket": {
             "Ref": "AVXLambdaZipsBucket"
           },
-          "S3Key": "quickstart-aviatrix-nggth/scripts/aviatrix_controller.py.zip"
+          "S3Key": { "Fn::Sub": "${QSS3KeyPrefix}scripts/aviatrix_controller.py.zip"}
         },
         "KmsKeyArn": {
           "Fn::GetAtt": [ "AVXKey", "Arn" ]
@@ -916,7 +945,7 @@
           "S3Bucket": {
             "Ref": "AVXLambdaZipsBucket"
           },
-          "S3Key": "quickstart-aviatrix-nggth/scripts/aviatrix_gateway.py.zip"
+          "S3Key": { "Fn::Sub": "${QSS3KeyPrefix}scripts/aviatrix_gateway.py.zip" }
         },
         "KmsKeyArn": {
           "Fn::GetAtt": [ "AVXKey", "Arn" ]
@@ -998,7 +1027,7 @@
           "S3Bucket": {
             "Ref": "AVXLambdaZipsBucket"
           },
-          "S3Key": "quickstart-aviatrix-nggth/scripts/aviatrix_poller.py.zip"
+          "S3Key": { "Fn::Sub": "${QSS3KeyPrefix}scripts/aviatrix_poller.py.zip" }
         },
         "KmsKeyArn": {
           "Fn::GetAtt": [ "AVXKey", "Arn" ]
