@@ -258,7 +258,7 @@
         "QSS3KeyPrefix": {
             "AllowedPattern": "^[0-9a-zA-Z-/]*$",
             "ConstraintDescription": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).",
-            "Default": "aviatrix/latest/",
+            "Default": "aviatrix/nextgentransithub/latest/",
             "Description": "S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).",
             "Type": "String"
         },
