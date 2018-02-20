@@ -815,7 +815,7 @@
           "S3Bucket": {
             "Ref": "AVXLambdaZipsBucket"
           },
-          "S3Key": "quickstart-aviatrix-nextgentransithub/scripts/aviatrix_controller.py.zip"
+          "S3Key": "${QSS3KeyPrefix}scripts/aviatrix_controller.py.zip"
         },
         "KmsKeyArn": {
           "Fn::GetAtt": [ "AVXKey", "Arn" ]
@@ -916,7 +916,7 @@
           "S3Bucket": {
             "Ref": "AVXLambdaZipsBucket"
           },
-          "S3Key": "quickstart-aviatrix-nextgentransithub/scripts/aviatrix_gateway.py.zip"
+          "S3Key": "${QSS3KeyPrefix}scripts/aviatrix_gateway.py.zip"
         },
         "KmsKeyArn": {
           "Fn::GetAtt": [ "AVXKey", "Arn" ]
@@ -998,7 +998,7 @@
           "S3Bucket": {
             "Ref": "AVXLambdaZipsBucket"
           },
-          "S3Key": "quickstart-aviatrix-nextgentransithub/scripts/aviatrix_poller.py.zip"
+          "S3Key": "${QSS3KeyPrefix}scripts/aviatrix_poller.py.zip"
         },
         "KmsKeyArn": {
           "Fn::GetAtt": [ "AVXKey", "Arn" ]
