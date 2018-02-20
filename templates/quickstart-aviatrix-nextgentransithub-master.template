@@ -143,7 +143,7 @@
     "QSS3KeyPrefix": {
        "AllowedPattern": "^[0-9a-zA-Z-/]*$",
        "ConstraintDescription": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).",
-       "Default": "quickstart-aviatrix-nggth/",
+       "Default": "quickstart-aviatrix-nextgentransithub/",
        "Description": "S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).",
        "Type": "String"
      }
@@ -229,7 +229,7 @@
       "Properties": {
           "TemplateURL": {
               "Fn::Sub": [
-                "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}templates/quickstart-aviatrix-nggth.template",
+                "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}templates/quickstart-aviatrix-nextgentransithub.template",
                   {
                       "QSS3Region": {
                           "Fn::If": [
