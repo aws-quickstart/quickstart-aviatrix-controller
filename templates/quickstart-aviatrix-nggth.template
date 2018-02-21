@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "Aviatrix Systems - Workload Stack - Creates the necessary policies, roles, security group and launches Aviatrix Controller instance",
+    "Description": "Aviatrix Systems - Workload Stack - Creates the necessary policies, roles, security group and launches Aviatrix Controller instance. **WARNING** You will be billed for the AWS resources used if you create a stack from this template. (qs-1o6p25lhf)",
     "Metadata": {
         "AWS::CloudFormation::Interface": {
             "ParameterGroups": [

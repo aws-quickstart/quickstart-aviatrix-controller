@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "Aviatrix Systems - Master Stack - Creates VPC and the necessary policies, roles, security group and launches Aviatrix Controller instance",
+    "Description": "Aviatrix Systems - Master Stack - Creates VPC and the necessary policies, roles, security group and launches Aviatrix Controller instance. **WARNING** You will be billed for the AWS resources used if you create a stack from this template. (qs-1o6p25lh9)",
     "Metadata": {
         "AWS::CloudFormation::Interface": {
             "ParameterGroups": [
