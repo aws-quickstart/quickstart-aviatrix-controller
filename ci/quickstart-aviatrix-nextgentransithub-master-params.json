@@ -66,5 +66,13 @@
     {
         "ParameterKey": "OtherAccountRoleEC2",
         "ParameterValue": ""
+    },
+    {
+        "ParameterKey": "QSS3BucketName",
+        "ParameterValue": "quickstart-reference"
+    },
+    {
+        "ParameterKey": "QSS3KeyPrefix",
+        "ParameterValue": "microsoft/activedirectory/latest/"
     }
 ]
