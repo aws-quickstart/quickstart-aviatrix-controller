@@ -97,19 +97,19 @@
                     "default": "Aviatrix Hub Gateway instance type"
                 },
                 "KeyPair": {
-                    "default": "Keypair"
+                    "default": "Key Pair"
                 },
                 "LicenseKey": {
-                    "default": "License key:"
+                    "default": "License key"
                 },
                 "LicenseModel": {
-                    "default": "Licensing Model:"
+                    "default": "Licensing Model"
                 },
                 "OtherAccount": {
                     "default": "Second Account number"
                 },
                 "OtherAccountRoleApp": {
-                    "default": "ARN for Aviatrix-role-app on secondary account"
+                    "default": "ARN for aviatrix-role-app on secondary account"
                 },
                 "OtherAccountRoleEC2": {
                     "default": "ARN for aviatrix-role-ec2 on secondary account"
@@ -361,7 +361,7 @@
             "Properties": {
                 "TemplateURL": {
                     "Fn::Sub": [
-                        "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}templates/quickstart-aviatrix-nggth.template",
+                        "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}templates/quickstart-aviatrix-nextgentransithub.template",
                         {
                             "QSS3Region": {
                                 "Fn::If": [

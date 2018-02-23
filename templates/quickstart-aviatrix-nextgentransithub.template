@@ -95,19 +95,19 @@
                     "default": "Aviatrix Hub Gateway instance type"
                 },
                 "KeyPair": {
-                    "default": "Keypair"
+                    "default": "Key Pair"
                 },
                 "LicenseKey": {
-                    "default": "Enter your license key:"
+                    "default": "License key"
                 },
                 "LicenseModel": {
-                    "default": "Licensing Model:"
+                    "default": "Licensing Model"
                 },
                 "OtherAccount": {
                     "default": "Second Account number"
                 },
                 "OtherAccountRoleApp": {
-                    "default": "ARN for Aviatrix-role-app on secondary account"
+                    "default": "ARN for aviatrix-role-app on secondary account"
                 },
                 "OtherAccountRoleEC2": {
                     "default": "ARN for aviatrix-role-ec2 on secondary account"
@@ -116,13 +116,13 @@
                     "default": "Aviatrix Controller Admin Password"
                 },
                 "PublicSubnet1": {
-                    "default": "Public Subnet 1"
+                    "default": "Public Subnet 1 ID"
                 },
                 "PublicSubnet1CIDR": {
                     "default": "Public Subnet 1 CIDR"
                 },
                 "PublicSubnet2": {
-                    "default": "Public Subnet 2"
+                    "default": "Public Subnet 2 ID"
                 },
                 "PublicSubnet2CIDR": {
                     "default": "Public Subnet 2 CIDR"
@@ -134,7 +134,7 @@
                     "default": "Quick Start S3 Key Prefix"
                 },
                 "SpokeGWSize": {
-                    "default": "Aviatrix Spoke Gateway instance type"
+                    "default": "Aviatrix Spoke Gateways instance type"
                 },
                 "SpokeTag": {
                     "default": "Spoke VPC Tag Name"
