@@ -1059,17 +1059,7 @@
                                 "Arn"
                             ]
                         },
-                        "Id": {
-                            "Fn::Join": [
-                                "-",
-                                [
-                                    {
-                                        "Ref": "AWS::StackName"
-                                    },
-                                    "Poller-2min"
-                                ]
-                            ]
-                        }
+                        "Id": { "Fn::GetAtt": ["AVXGetID", "Data"] }
                     }
                 ]
             },
