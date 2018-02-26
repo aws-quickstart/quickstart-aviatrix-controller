@@ -11,9 +11,9 @@
                     "Parameters": [
                         "VPCID",
                         "PublicSubnet1CIDR",
-                        "PublicSubnet1",
+                        "PublicSubnet1ID",
                         "PublicSubnet2CIDR",
-                        "PublicSubnet2"
+                        "PublicSubnet2ID"
                     ]
                 },
                 {
@@ -98,10 +98,10 @@
                     "default": "Keypair"
                 },
                 "LicenseKey": {
-                    "default": "Enter your license key:"
+                    "default": "Enter your license key"
                 },
                 "LicenseModel": {
-                    "default": "Licensing Model:"
+                    "default": "Licensing Model"
                 },
                 "OtherAccount": {
                     "default": "Second Account number"
@@ -115,13 +115,13 @@
                 "Password": {
                     "default": "Aviatrix Controller Admin Password"
                 },
-                "PublicSubnet1": {
+                "PublicSubnet1ID": {
                     "default": "Public Subnet 1"
                 },
                 "PublicSubnet1CIDR": {
                     "default": "Public Subnet 1 CIDR"
                 },
-                "PublicSubnet2": {
+                "PublicSubnet2ID": {
                     "default": "Public Subnet 2"
                 },
                 "PublicSubnet2CIDR": {
@@ -228,7 +228,7 @@
             "NoEcho": true,
             "Type": "String"
         },
-        "PublicSubnet1": {
+        "PublicSubnet1ID": {
             "Description": "Public subnet 1 Id",
             "Type": "AWS::EC2::Subnet::Id"
         },
@@ -238,7 +238,7 @@
             "Description": "CIDR Block for the public DMZ subnet 1 located in Availability Zone 1",
             "Type": "String"
         },
-        "PublicSubnet2": {
+        "PublicSubnet2ID": {
             "Description": "Public subnet 2 Id",
             "Type": "AWS::EC2::Subnet::Id"
         },
@@ -469,7 +469,7 @@
                             }
                         ],
                         "SubnetId": {
-                            "Ref": "PublicSubnet1"
+                            "Ref": "PublicSubnet1ID"
                         }
                     }
                 ],

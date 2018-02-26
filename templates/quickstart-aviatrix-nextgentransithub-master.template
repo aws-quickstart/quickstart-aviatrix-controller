@@ -100,10 +100,10 @@
                     "default": "Keypair"
                 },
                 "LicenseKey": {
-                    "default": "License key:"
+                    "default": "License key"
                 },
                 "LicenseModel": {
-                    "default": "Licensing Model:"
+                    "default": "Licensing Model"
                 },
                 "OtherAccount": {
                     "default": "Second Account number"
@@ -407,7 +407,7 @@
                     "Password": {
                         "Ref": "Password"
                     },
-                    "PublicSubnet1": {
+                    "PublicSubnet1ID": {
                         "Fn::GetAtt": [
                             "VPCStack",
                             "Outputs.PublicSubnet1ID"
@@ -419,7 +419,7 @@
                             "Outputs.PublicSubnet1CIDR"
                         ]
                     },
-                    "PublicSubnet2": {
+                    "PublicSubnet2ID": {
                         "Fn::GetAtt": [
                             "VPCStack",
                             "Outputs.PublicSubnet2ID"
