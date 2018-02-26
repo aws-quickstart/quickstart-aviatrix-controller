@@ -224,6 +224,7 @@
             "Type": "String"
         },
         "Password": {
+            "AllowedPattern": "^(?:(?=.*[a-z])(?:(?=.*[A-Z])(?=.*[\\d\\W])|(?=.*\\W)(?=.*\\d))|(?=.*\\W)(?=.*[A-Z])(?=.*\\d)).{8,}$",
             "Description": " Password for the controller. Please use a complex password.",
             "NoEcho": true,
             "Type": "String"
