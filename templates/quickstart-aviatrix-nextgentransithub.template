@@ -11,9 +11,9 @@
                     "Parameters": [
                         "VPCID",
                         "PublicSubnet1CIDR",
-                        "PublicSubnet1",
+                        "PublicSubnet1ID",
                         "PublicSubnet2CIDR",
-                        "PublicSubnet2"
+                        "PublicSubnet2ID"
                     ]
                 },
                 {
@@ -98,7 +98,7 @@
                     "default": "Key Pair"
                 },
                 "LicenseKey": {
-                    "default": "License key"
+                    "default": "Enter your license key"
                 },
                 "LicenseModel": {
                     "default": "Licensing Model"
@@ -115,14 +115,14 @@
                 "Password": {
                     "default": "Aviatrix Controller Admin Password"
                 },
-                "PublicSubnet1": {
-                    "default": "Public Subnet 1 ID"
+                "PublicSubnet1ID": {
+                    "default": "Public Subnet 1"
                 },
                 "PublicSubnet1CIDR": {
                     "default": "Public Subnet 1 CIDR"
                 },
-                "PublicSubnet2": {
-                    "default": "Public Subnet 2 ID"
+                "PublicSubnet2ID": {
+                    "default": "Public Subnet 2"
                 },
                 "PublicSubnet2CIDR": {
                     "default": "Public Subnet 2 CIDR"
@@ -224,11 +224,12 @@
             "Type": "String"
         },
         "Password": {
+            "AllowedPattern": "^(?:(?=.*[a-z])(?:(?=.*[A-Z])(?=.*[\\d\\W])|(?=.*\\W)(?=.*\\d))|(?=.*\\W)(?=.*[A-Z])(?=.*\\d)).{8,}$",
             "Description": " Password for the controller. Please use a complex password.",
             "NoEcho": true,
             "Type": "String"
         },
-        "PublicSubnet1": {
+        "PublicSubnet1ID": {
             "Description": "Public subnet 1 Id",
             "Type": "AWS::EC2::Subnet::Id"
         },
@@ -238,7 +239,7 @@
             "Description": "CIDR Block for the public DMZ subnet 1 located in Availability Zone 1",
             "Type": "String"
         },
-        "PublicSubnet2": {
+        "PublicSubnet2ID": {
             "Description": "Public subnet 2 Id",
             "Type": "AWS::EC2::Subnet::Id"
         },
@@ -469,7 +470,7 @@
                             }
                         ],
                         "SubnetId": {
-                            "Ref": "PublicSubnet1"
+                            "Ref": "PublicSubnet1ID"
                         }
                     }
                 ],

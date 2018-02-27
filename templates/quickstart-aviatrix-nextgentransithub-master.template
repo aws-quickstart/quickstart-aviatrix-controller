@@ -224,6 +224,7 @@
             "Type": "String"
         },
         "Password": {
+            "AllowedPattern": "^(?:(?=.*[a-z])(?:(?=.*[A-Z])(?=.*[\\d\\W])|(?=.*\\W)(?=.*\\d))|(?=.*\\W)(?=.*[A-Z])(?=.*\\d)).{8,}$",
             "Description": " Password for the controller. Please use a complex password.",
             "NoEcho": true,
             "Type": "String"
@@ -407,7 +408,7 @@
                     "Password": {
                         "Ref": "Password"
                     },
-                    "PublicSubnet1": {
+                    "PublicSubnet1ID": {
                         "Fn::GetAtt": [
                             "VPCStack",
                             "Outputs.PublicSubnet1ID"
@@ -419,7 +420,7 @@
                             "Outputs.PublicSubnet1CIDR"
                         ]
                     },
-                    "PublicSubnet2": {
+                    "PublicSubnet2ID": {
                         "Fn::GetAtt": [
                             "VPCStack",
                             "Outputs.PublicSubnet2ID"
