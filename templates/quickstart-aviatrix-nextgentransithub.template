@@ -98,7 +98,7 @@
                     "default": "Key Pair"
                 },
                 "LicenseKey": {
-                    "default": "Enter your license key"
+                    "default": "License key"
                 },
                 "LicenseModel": {
                     "default": "Licensing Model"
@@ -113,16 +113,16 @@
                     "default": "ARN for aviatrix-role-ec2 on secondary account"
                 },
                 "Password": {
-                    "default": "Aviatrix Controller Admin Password"
+                    "default": "Aviatrix Controller admin password"
                 },
                 "PublicSubnet1ID": {
-                    "default": "Public Subnet 1"
+                    "default": "Public Subnet 1 ID"
                 },
                 "PublicSubnet1CIDR": {
                     "default": "Public Subnet 1 CIDR"
                 },
                 "PublicSubnet2ID": {
-                    "default": "Public Subnet 2"
+                    "default": "Public Subnet 2 ID"
                 },
                 "PublicSubnet2CIDR": {
                     "default": "Public Subnet 2 CIDR"
