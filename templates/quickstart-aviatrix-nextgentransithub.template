@@ -1100,14 +1100,9 @@
                             ]
                         },
                         "Id": {
-                            "Fn::Join": [
-                                "-",
-                                [
-                                    {
-                                        "Ref": "AWS::StackName"
-                                    },
-                                    "Poller-2min"
-                                ]
+                            "Fn::GetAtt": [
+                                "AVXGetID",
+                                "Data"
                             ]
                         }
                     }
