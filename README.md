@@ -8,7 +8,7 @@ You can add spoke VPCs to the network by tagging them in AWS. Aviatrix Global Tr
 
 The Quick Start offers two deployment options:
 
-- Deploying Aviatrix Global Transit Hub into a new virtual private cloud (VPC) on AWS
+- Deploying Aviatrix Global Transit Hub into a new VPC on AWS
 - Deploying Aviatrix Global Transit Hub into an existing VPC on AWS
 
 You can also use the AWS CloudFormation templates as a starting point for your own implementation.
