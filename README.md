@@ -13,7 +13,7 @@ The Quick Start offers two deployment options:
 
 You can also use the AWS CloudFormation templates as a starting point for your own implementation.
 
-![Quick Start architecture for Aviatrix Global Transit Hub on AWS](https://d0.awsstatic.com/partner-network/QuickStart/datasheets/aviatrix-global-transit-hub-architecture-on-aws.png)
+![Quick Start architecture for Aviatrix Global Transit Hub on AWS](https://d0.awsstatic.com/partner-network/QuickStart/datasheets/aviatrix-global-transit-hub-architecture-on-aws.jpg)
 
 For architectural details, best practices, step-by-step instructions, and customization options, see the 
 [deployment guide](https://s3.amazonaws.com/quickstart-reference/aviatrix/nextgentransithub/latest/doc/aviatrix-global-transit-hub-on-the-aws-cloud.pdf).
