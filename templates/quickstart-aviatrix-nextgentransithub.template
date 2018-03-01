@@ -506,7 +506,7 @@
                         "Ref": "AVXLambdaZipsBucket"
                     },
                     "S3Key": {
-                        "Fn::Sub": "${QSS3KeyPrefix}scripts/aviatrix_controller.py.zip"
+                        "Fn::Sub": "${QSS3KeyPrefix}functions/packages/aviatrix_controller.py.zip"
                     }
                 },
                 "Environment": {
@@ -640,9 +640,9 @@
                     "Ref": "AVXLambdaZipsBucket"
                 },
                 "Objects": [
-                    "scripts/aviatrix_controller.py.zip",
-                    "scripts/aviatrix_gateway.py.zip",
-                    "scripts/aviatrix_poller.py.zip"
+                    "functions/packages/aviatrix_controller.py.zip",
+                    "functions/packages/aviatrix_gateway.py.zip",
+                    "functions/packages/aviatrix_poller.py.zip"
                 ],
                 "Prefix": {
                     "Ref": "QSS3KeyPrefix"
@@ -779,7 +779,7 @@
                         "Ref": "AVXLambdaZipsBucket"
                     },
                     "S3Key": {
-                        "Fn::Sub": "${QSS3KeyPrefix}scripts/aviatrix_gateway.py.zip"
+                        "Fn::Sub": "${QSS3KeyPrefix}functions/packages/aviatrix_gateway.py.zip"
                     }
                 },
                 "Environment": {
@@ -1138,7 +1138,7 @@
                         "Ref": "AVXLambdaZipsBucket"
                     },
                     "S3Key": {
-                        "Fn::Sub": "${QSS3KeyPrefix}scripts/aviatrix_poller.py.zip"
+                        "Fn::Sub": "${QSS3KeyPrefix}functions/packages/aviatrix_poller.py.zip"
                     }
                 },
                 "Environment": {
