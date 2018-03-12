@@ -14,12 +14,18 @@ class Aviatrix:
         self.ctx.check_hostname = False
         self.ctx.verify_mode = ssl.CERT_NONE
     def avx_api_call(self,method,action,parameters):
-        url = "https://%s/v1/api?action=%s" % (self.controller_ip,action)
-        for key,value in parameters.items():
-            value = quote(value, safe='')
-            url = url + "&%s=%s" % (key,value)
+        if method == "POST":
+            url = "https://%s/v1/api" % self.controller_ip
+            parameters["action"] = action
+        else:
+            url = "https://%s/v1/api?action=%s" % (self.controller_ip,action)
+            for key,value in parameters.items():
+                value = quote(value, safe='')
+                url = url + "&%s=%s" % (key,value)
         self.url = url
         logging.info("aviatrix3.py - Executing API call:%s" % self.url)
+        if method == "POST":
+            logging.info("POST api data: %s" % str(parameters))
         try:
             if method == "POST":
                 data = urllib.parse.urlencode(parameters).encode("utf-8")
@@ -107,10 +113,9 @@ class Aviatrix:
                                                     "vpc_name": vpc_name,
                                                     "specific_subnet": specific_subnet })
 
-    def disable_vpc_ha(self,vpc_name,specific_subnet):
+    def disable_vpc_ha(self,vpc_name):
         self.avx_api_call("POST","disable_vpc_ha", { "CID": self.CID,
-                                                    "vpc_name": vpc_name,
-                                                    "specific_subnet": specific_subnet })
+                                                    "vpc_name": vpc_name })
 
     def add_extended_vpc_peer(self,source,nexthop,reachable_cidr):
         self.avx_api_call("POST", "add_extended_vpc_peer", { "CID": self.CID,
