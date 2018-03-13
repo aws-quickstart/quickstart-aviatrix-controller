@@ -390,6 +390,8 @@ def delete_gw(controller,body):
         tag_spoke(ec2,region_spoke,vpcid_spoke,spoketag,'unpeering')
         controller.unpeering("hub-"+vpcid_hub, "spoke-"+vpcid_spoke)
         #Spoke Gateway Delete
+        logger.info('disable gateway ha')
+        controller.disable_vpc_ha("spoke-"+vpcid_spoke)
         logger.info('Deleting Gateway: spoke-%s', vpcid_spoke)
         controller.delete_gateway("1", "spoke-"+vpcid_spoke)
         logger.info('Done unPeering %s. Updating tag:%s to unpeered' % (vpcid_spoke,spoketag))

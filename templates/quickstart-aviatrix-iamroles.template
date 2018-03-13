@@ -308,7 +308,8 @@
                                 "sqs:ReceiveMessage",
                                 "sqs:RemovePermission",
                                 "sqs:SendMessage",
-                                "sqs:SetQueueAttributes"
+                                "sqs:SetQueueAttributes",
+                                "sqs:TagQueue"
                             ],
                             "Resource": "*"
                         },
