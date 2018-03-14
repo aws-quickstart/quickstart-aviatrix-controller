@@ -215,6 +215,7 @@ def delete_handler(event, context):
         if gateways:
             for gateway in gateways:
                 logger.info('aviatrix-controller.py - Deleting gateway %s', gateway['vpc_name'])
+                controller.disable_vpc_ha(gateway['vpc_name'])
                 controller.delete_gateway('1',gateway['vpc_name'])
         logger.info('Waiting for controller to be completely done')
         time.sleep(30)
