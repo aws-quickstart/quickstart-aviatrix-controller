@@ -16,7 +16,7 @@ You can also use the AWS CloudFormation templates as a starting point for your o
 ![Quick Start architecture for Aviatrix Global Transit Hub on AWS](https://d0.awsstatic.com/partner-network/QuickStart/datasheets/aviatrix-global-transit-hub-architecture-on-aws.jpg)
 
 For architectural details, best practices, step-by-step instructions, and customization options, see the 
-[deployment guide](https://s3.amazonaws.com/quickstart-reference/aviatrix/nextgentransithub/latest/doc/aviatrix-global-transit-hub-on-the-aws-cloud.pdf).
+[deployment guide](https://fwd.aws/WENBA).
 
 To post feedback, submit feature ideas, or report bugs, use the **Issues** section of this GitHub repo.
 If you'd like to submit code for this Quick Start, please review the [AWS Quick Start Contributor's Kit](https://aws-quickstart.github.io/). 
