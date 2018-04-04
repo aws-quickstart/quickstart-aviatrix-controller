@@ -26,7 +26,7 @@
                 },
                 {
                   "Label": {
-                    "default": "IAM role creation"
+                    "default": "IAM Roles"
                   },
                   "Parameters": [
                     "IAMRoleParam"
@@ -53,13 +53,13 @@
                     "default": "Public Subnet 2 CIDR"
                 },
                 "KeyNameParam": {
-                  "default": "Which keypair will be used?"
+                  "default": "Key Pair"
                 },
                 "IAMRoleParam": {
-                  "default": "Select New if Aviatrix IAM role has not been created (first time launch). Select aviatrix-role-ec2 if there is already Aviatrix IAM role created"
+                  "default": "Create the IAM roles"
                 },
                 "InstanceTypeParam": {
-                  "default": "Select Controller Size"
+                  "default": "Aviatrix Controller instance type"
                 },
                 "AvailabilityZones": {
                     "default": "Availability zones"
@@ -100,7 +100,7 @@
           "Description": "Select your Keypair"
         },
         "IAMRoleParam": {
-          "Description": "Determine if IAM roles aviatrix-role-ec2 and aviatrix-role-app should be created.",
+          "Description": "Select New if Aviatrix IAM role has not been created (first time launch). Select aviatrix-role-ec2 if there is already Aviatrix IAM role created",
           "Default": "New",
           "Type": "String",
           "AllowedValues": [

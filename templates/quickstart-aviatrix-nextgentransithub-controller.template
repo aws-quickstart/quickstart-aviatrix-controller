@@ -24,7 +24,7 @@
         },
         {
           "Label": {
-            "default": "IAM role creation"
+            "default": "IAM Roles"
           },
           "Parameters": [
             "IAMRoleParam"
@@ -33,19 +33,19 @@
       ],
       "ParameterLabels": {
         "VPCParam": {
-          "default": "Which VPC should the Aviatrix Controller be deployed in?"
+          "default": "VPC ID"
         },
         "SubnetParam": {
-          "default": "Which public subnet in the VPC?"
+          "default": "Public Subnet ID"
         },
         "KeyNameParam": {
-          "default": "Which keypair will be used?"
+          "default": "Key Pair"
         },
         "IAMRoleParam": {
-          "default": "Select New if Aviatrix IAM role has not been created (first time launch). Select aviatrix-role-ec2 if there is already Aviatrix IAM role created"
+          "default": "Create the IAM roles"
         },
         "InstanceTypeParam": {
-          "default": "Select Controller Size"
+          "default": "Aviatrix Controller instance type"
         }
       }
     }
@@ -54,7 +54,7 @@
   "Parameters": {
     "VPCParam": {
       "Type": "AWS::EC2::VPC::Id",
-      "Description": "Select Your VPC"
+      "Description": "Select VPC which Aviatrix Controller will be deployed in"
     },
     "SubnetParam": {
       "Type": "AWS::EC2::Subnet::Id",
@@ -65,7 +65,7 @@
       "Description": "Select your Keypair"
     },
     "IAMRoleParam": {
-      "Description": "Determine if IAM roles aviatrix-role-ec2 and aviatrix-role-app should be created.",
+      "Description": "Select New if Aviatrix IAM role has not been created (first time launch). Select aviatrix-role-ec2 if there is already Aviatrix IAM role created",
       "Default": "New",
       "Type": "String",
       "AllowedValues": [
@@ -103,22 +103,30 @@
   },
 
   "Mappings": {
-    "RegionMap": {
-      "us-east-1":      { "Name": "ami-e099849a" },
-      "us-east-2":      { "Name": "ami-55face30" },
-      "us-west-1":      { "Name": "ami-e4010884" },
-      "us-west-2":      { "Name": "ami-3bca4943" },
-      "ca-central-1":   { "Name": "ami-b10581d5" },
-      "eu-central-1":   { "Name": "ami-c12c4dae" },
-      "eu-west-1":      { "Name": "ami-1770006e" },
-      "eu-west-2":      { "Name": "ami-ae09ecc9" },
-      "eu-west-3":      { "Name": "ami-48982e35" },
-      "ap-southeast-1": { "Name": "ami-ccd391b0" },
-      "ap-southeast-2": { "Name": "ami-73ba7f11" },
-      "ap-northeast-2": { "Name": "ami-675af809" },
-      "ap-northeast-1": { "Name": "ami-13bec375" },
-      "ap-south-1":     { "Name": "ami-fe134e91" },
-      "sa-east-1":      { "Name": "ami-51246d3d" }
+    "AWSAMIRegionMap": {
+      "AMI": {
+        "AVIATRIXMetered": "aviatrix_cloud_services_gateway_111517_Metering_Usage-0c922525-51c4-4b64-94ec-744291c05c1c-ami-2a393050.4" 
+      },
+      "us-east-1":      { "AVIATRIXMetered": "ami-e099849a" },
+      "us-east-2":      { "AVIATRIXMetered": "ami-55face30" },
+      "us-west-1":      { "AVIATRIXMetered": "ami-e4010884" },
+      "us-west-2":      { "AVIATRIXMetered": "ami-3bca4943" },
+      "ca-central-1":   { "AVIATRIXMetered": "ami-b10581d5" },
+      "eu-central-1":   { "AVIATRIXMetered": "ami-c12c4dae" },
+      "eu-west-1":      { "AVIATRIXMetered": "ami-1770006e" },
+      "eu-west-2":      { "AVIATRIXMetered": "ami-ae09ecc9" },
+      "eu-west-3":      { "AVIATRIXMetered": "ami-48982e35" },
+      "ap-southeast-1": { "AVIATRIXMetered": "ami-ccd391b0" },
+      "ap-southeast-2": { "AVIATRIXMetered": "ami-73ba7f11" },
+      "ap-northeast-2": { "AVIATRIXMetered": "ami-675af809" },
+      "ap-northeast-1": { "AVIATRIXMetered": "ami-13bec375" },
+      "ap-south-1":     { "AVIATRIXMetered": "ami-fe134e91" },
+      "sa-east-1":      { "AVIATRIXMetered": "ami-51246d3d" },
+    },
+    "AMINameMap": {
+      "Metered": {
+        "Code": "AVIATRIXMetered"
+      }
     }
   },
 
@@ -425,11 +433,17 @@
       "Properties": {
         "ImageId": {
           "Fn::FindInMap": [
-            "RegionMap",
+            "AWSAMIRegionMap",
             {
               "Ref": "AWS::Region"
             },
-            "Name"
+            {
+              "Fn::FindInMap": [
+                "AMINameMap",
+                "Metered",
+                "Code"
+              ]
+            }
           ]
         },
         "DisableApiTermination": "true",
