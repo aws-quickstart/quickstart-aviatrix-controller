@@ -1,0 +1,30 @@
+[
+    {
+        "ParameterKey": "KeyNameParam",
+        "ParameterValue": "$[alfred_getkeypair]"
+    },
+    {
+        "ParameterKey": "VPCParam",
+        "ParameterValue": "10.0.0.0/16"
+    },
+    {
+        "ParameterKey": "AvailabilityZones",
+        "ParameterValue": "$[alfred_genaz_2]"
+    },
+    {
+        "ParameterKey": "PublicSubnet1CIDR",
+        "ParameterValue": "10.0.10.0/24"
+    },
+    {
+        "ParameterKey": "PublicSubnet2CIDR",
+        "ParameterValue": "10.0.20.0/24"
+    },
+    {
+        "ParameterKey": "InstanceTypeParam",
+        "ParameterValue": "t2.large"
+    },
+    {
+        "ParameterKey": "IAMRoleParam",
+        "ParameterValue": "New"
+    }
+]
