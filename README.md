@@ -1,19 +1,21 @@
 # quickstart-aviatrix-nextgentransithub
-## Aviatrix Global Transit Hub on the AWS Cloud
+## Aviatrix Next-Gen Global Transit Hub on the AWS Cloud
 
 
-This Quick Start builds a highly available, secure global transit network on the Amazon Web Services (AWS) Cloud in about 10 minutes. It deploys Aviatrix Controller and Aviatrix Gateways in a central virtual private cloud (VPC) on AWS to manage routing between remote networks (spoke VPCs) in a hub-and-spoke model. 
+This Quick Start builds a highly available, secure global transit network on the Amazon Web Services (AWS) Cloud in about 5 minutes. It deploys Aviatrix Controller and Aviatrix Gateways in a central virtual private cloud (VPC) on AWS to manage routing between remote networks (spoke VPCs) in a hub-and-spoke model. 
 
-You can add spoke VPCs to the network by tagging them in AWS. Aviatrix Global Transit Hub automatically establishes VPN connections between the spoke VPCs and the hub VPC by using AWS CloudFormation templates and AWS Lambda functions. The transit network supports multiple AWS accounts and can be extended to include shared services with direct peering, or to connect your cloud network to on-premises networks.
+After you deploy the Aviatrix Controller using this Quick Start, you can use the Aviatrix Global Transit Network Wizard in the Aviatrix Controller to deploy the Hub Gateway instances into a VPC that will be designated as the Next-Gen Global Transit Hub. The wizard allows you to launch and configure two Aviatrix Gateways in the transit hub VPC and the designated spoke VPCs. The gateway instances allow for IPsec VPN termination, routing, and security policies, and provide ongoing monitoring.
+
+Once you have established your transit VPC, you can extend beyond the AWS Cloud and automatically configure VPN connections to an on-premises infrastructure or other network providers with the Aviatrix Controller. Aviatrix also enables you to expand your global transit architecture to include a Shared Services layer with AWS Direct Peering. This helps support teams that require a shared or management VPC for common services in the cloud.
 
 The Quick Start offers two deployment options:
 
-- Deploying Aviatrix Global Transit Hub into a new VPC on AWS
-- Deploying Aviatrix Global Transit Hub into an existing VPC on AWS
+- Deploying Aviatrix Next-Gen Global Transit Hub into a new VPC on AWS
+- Deploying Aviatrix Next-Gen Global Transit Hub into an existing VPC on AWS
 
 You can also use the AWS CloudFormation templates as a starting point for your own implementation.
 
-![Quick Start architecture for Aviatrix Global Transit Hub on AWS](https://d0.awsstatic.com/partner-network/QuickStart/datasheets/aviatrix-global-transit-hub-architecture-on-aws.jpg)
+![Quick Start architecture for Aviatrix Next-Gen Global Transit Hub on AWS](https://d1.awsstatic.com/partner-network/QuickStart/datasheets/aviatrix-next-gen-on-aws-architecture.ce5fc19c138ec20817c3bf747034b5dac63b3f47.png)
 
 For architectural details, best practices, step-by-step instructions, and customization options, see the 
 [deployment guide](https://fwd.aws/WENBA).
