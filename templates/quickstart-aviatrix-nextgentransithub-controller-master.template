@@ -25,12 +25,12 @@
                     ]
                 },
                 {
-                  "Label": {
-                    "default": "IAM Roles"
-                  },
-                  "Parameters": [
-                    "IAMRoleParam"
-                  ]
+                    "Label": {
+                        "default": "IAM Roles"
+                    },
+                    "Parameters": [
+                        "IAMRoleParam"
+                    ]
                 },
                 {
                     "Label": {
@@ -44,7 +44,7 @@
             ],
             "ParameterLabels": {
                 "VPCCIDR": {
-                  "default": "VPC CIDR"
+                    "default": "VPC CIDR"
                 },
                 "PublicSubnet1CIDR": {
                     "default": "Public Subnet 1 CIDR"
@@ -53,18 +53,18 @@
                     "default": "Public Subnet 2 CIDR"
                 },
                 "KeyNameParam": {
-                  "default": "Key Pair"
+                    "default": "Key Pair"
                 },
                 "IAMRoleParam": {
-                  "default": "Create the IAM roles"
+                    "default": "Create the IAM roles"
                 },
                 "InstanceTypeParam": {
-                  "default": "Aviatrix Controller instance type"
+                    "default": "Aviatrix Controller instance type"
                 },
                 "AvailabilityZones": {
                     "default": "Availability zones"
                 },
-                 "QSS3BucketName": {
+                "QSS3BucketName": {
                     "default": "Quick Start S3 Bucket Name"
                 },
                 "QSS3KeyPrefix": {
@@ -96,38 +96,36 @@
             "Type": "String"
         },
         "KeyNameParam": {
-          "Type": "AWS::EC2::KeyPair::KeyName",
-          "Description": "Select your Keypair"
+            "Type": "AWS::EC2::KeyPair::KeyName",
+            "Description": "Select your Keypair"
         },
         "IAMRoleParam": {
-          "Description": "Select New if Aviatrix IAM role has not been created (first time launch). Select aviatrix-role-ec2 if there is already Aviatrix IAM role created",
-          "Default": "New",
-          "Type": "String",
-          "AllowedValues": [
-            "aviatrix-role-ec2",
-            "New"
-          ]
+            "Description": "Select New if Aviatrix IAM role has not been created (first time launch). Select aviatrix-role-ec2 if there is already Aviatrix IAM role created",
+            "Default": "New",
+            "Type": "String",
+            "AllowedValues": [
+                "aviatrix-role-ec2",
+                "New"
+            ]
         },
         "InstanceTypeParam": {
-          "Type": "String",
-          "Default": "t2.large",
-          "AllowedValues": [
-            "t2.medium",
-            "t2.large",
-            "t2.xlarge",
-            "t2.2xlarge",
-
-            "m4.large",
-            "m4.xlarge",
-            "m4.2xlarge",
-            "m4.4xlarge",
-
-            "c4.large",
-            "c4.xlarge",
-            "c4.2xlarge",
-            "c4.4xlarge"
-          ],
-          "Description": "Select an instance size for the controller."
+            "Type": "String",
+            "Default": "t2.large",
+            "AllowedValues": [
+                "t2.medium",
+                "t2.large",
+                "t2.xlarge",
+                "t2.2xlarge",
+                "m4.large",
+                "m4.xlarge",
+                "m4.2xlarge",
+                "m4.4xlarge",
+                "c4.large",
+                "c4.xlarge",
+                "c4.2xlarge",
+                "c4.4xlarge"
+            ],
+            "Description": "Select an instance size for the controller."
         },
         "AvailabilityZones": {
             "Description": "List of Availability Zones to use for the subnets in the VPC. Note: The logical order is preserved and only 2 AZs are used for this deployment.",
@@ -249,12 +247,12 @@
         }
     },
     "Outputs": {
-    	"AccountId": {
-    	  "Description": "Amazon Account ID",
-    	  "Value": {
-    	    "Ref": "AWS::AccountId"
-    	  }
-    	},
+        "AccountId": {
+            "Description": "Amazon Account ID",
+            "Value": {
+                "Ref": "AWS::AccountId"
+            }
+        },
         "AviatrixControllerEIP": {
             "Description": "AviatrixController External IP",
             "Value": {
