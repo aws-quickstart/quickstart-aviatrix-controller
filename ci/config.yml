@@ -1,7 +1,7 @@
 global:
   marketplace-ami: true
   owner: quickstart@amazon.com
-  qsname: quickstart-aviatrix-nextgentransithub
+  qsname: quickstart-aviatrix-controller
   regions:
     - ap-northeast-1
     - ap-northeast-2
