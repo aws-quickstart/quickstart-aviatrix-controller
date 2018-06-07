@@ -1,9 +1,9 @@
 # quickstart-aviatrix-controller
 
 
-This Quick Start builds a highly available, Aviatrix Controller in a virtual private cloud (VPC) on AWS. 
+This readme covers two Amazon Web Services (AWS) Quick Starts that help you build a highly available Aviatrix Controller in a virtual private cloud (VPC) on the AWS Cloud. 
 
-The Quick Start offers two deployment options:
+There are two options for deploying the Aviatrix Controller, along with a corresponding AWS Quick Start:
 
 - [Deploying Aviatrix Next-Gen Global Transit Hub on AWS](Transit-Hub-README.md)
 - [Deploying Aviatrix User VPN on AWS](User-VPN-README.md)
