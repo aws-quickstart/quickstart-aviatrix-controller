@@ -1,14 +1,12 @@
-# quickstart-aviatrix-user-vpn
-## Aviatrix User VPN on the AWS Cloud
+# quickstart-fqdn-egress-filtering
+## Aviatrix FQDN Egress Filtering on the AWS Cloud
 
 
-This Quick Start builds a highly available user VPN solution on the Amazon Web Services (AWS) Cloud in about 10-15 minutes. It deploys the Aviatrix Controller, Aviatrix gateways, authentication services, and log analytics.
+This Quick Start builds a highly available, secure Fully Qualified Domain Name (FQDN) Egress Filtering service on the Amazon Web Services (AWS) Cloud in about 10 minutes. It automatically deploys an Aviatrix Controller for enabling Egress Filtering in a new or existing virtual private cloud (VPC).
 
-The Aviatrix User VPN enables you to connect directly to the AWS Cloud workloads from remote locations. You can assign each VPN user to a profile that gives access privileges to a multicloud network, hosts, protocols, and ports.
+With this Quick Start, you can connect to VPCs in the AWS Cloud with enhanced security, and access your Amazon Elastic Compute Cloud (Amazon EC2) instances, applications, and services. The Aviatrix Controller deploys Aviatrix gateways in your VPCs, and configures egress security policies across all gateways.
 
-The point-and-click, centralized management console (with REST API support) manages distributed gateways that CloudOps and network engineers can operate without needing deep networking skills.
-
-After you deploy the Quick Start, and take advantage of the User VPN Wizard to establish your User VPN service, you can extend the environment beyond the AWS Cloud. By using the Aviatrix Controller, you can configure VPN access to other VPCs, other network providers, on-premises infrastructure, or other public cloud providers.
+After you’ve used this Quick Start to deploy the Aviatrix Controller in one of your VPCs, the Egress Security wizard in the controller helps you deploy and configure Aviatrix gateways for Egress Filtering.
 
 The Quick Start offers two deployment options:
 
@@ -17,10 +15,10 @@ The Quick Start offers two deployment options:
 
 You can also use the AWS CloudFormation templates as a starting point for your own implementation.
 
-![Quick Start architecture for Aviatrix User VPN on AWS]( https://d1.awsstatic.com/partner-network/QuickStart/datasheets/aviatrix-user-vpn-on-aws-architecture.0f0b5548d7aac1acca69456601f3fad88b358db3.png)
+![Quick Start architecture for Aviatrix FQDN Egress Filtering on AWS](https://d1.awsstatic.com/partner-network/QuickStart/datasheets/aviatrix-fqdn-egress-filtering-on-aws-architecture.34e57d3d74a18aa538311287bebdac12f3643f48.png)
 
 For architectural details, best practices, step-by-step instructions, and customization options, see the 
-[deployment guide]( https://fwd.aws/8zvqJ).
+[deployment guide]( https://fwd.aws/Q8Pg7).
 
 To post feedback, submit feature ideas, or report bugs, use the **Issues** section of this GitHub repo.
 If you'd like to submit code for this Quick Start, please review the [AWS Quick Start Contributor's Kit](https://aws-quickstart.github.io/).
