@@ -26,5 +26,9 @@
     {
         "ParameterKey": "IAMRoleParam",
         "ParameterValue": "New"
+    },
+    {
+        "ParameterKey":"QSS3BucketName",
+        "ParameterValue":"$[taskcat_autobucket]"
     }
 ]
