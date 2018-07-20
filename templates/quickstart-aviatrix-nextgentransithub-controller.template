@@ -275,7 +275,8 @@
                                 "s3:List*",
                                 "s3:Get*",
                                 "iam:List*",
-                                "iam:Get*"
+                                "iam:Get*",
+                                "directconnect:Describe*"
                             ],
                             "Resource": "*"
                         },
@@ -375,7 +376,15 @@
                                 "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
                                 "elasticloadbalancing:ModifyLoadBalancerAttributes",
                                 "elasticloadbalancing:SetLoadBalancerPoliciesForBackendServer",
-                                "elasticloadbalancing:RegisterInstancesWithLoadBalancer"
+                                "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
+                                "elasticloadbalancing:CreateTargetGroup",
+                                "elasticloadbalancing:DescribeTargetGroups",
+                                "elasticloadbalancing:DeleteTargetGroup",
+                                "elasticloadbalancing:CreateListener",
+                                "elasticloadbalancing:DescribeListeners",
+                                "elasticloadbalancing:DeleteListener",
+                                "elasticloadbalancing:ModifyLoadBalancerAttributes",
+                                "elasticloadbalancing:RegisterTargets"
                             ],
                             "Resource": "*"
                         },
