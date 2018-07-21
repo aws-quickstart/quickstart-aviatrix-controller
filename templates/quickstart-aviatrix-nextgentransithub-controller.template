@@ -383,7 +383,6 @@
                                 "elasticloadbalancing:CreateListener",
                                 "elasticloadbalancing:DescribeListeners",
                                 "elasticloadbalancing:DeleteListener",
-                                "elasticloadbalancing:ModifyLoadBalancerAttributes",
                                 "elasticloadbalancing:RegisterTargets"
                             ],
                             "Resource": "*"
