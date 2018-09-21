@@ -242,6 +242,18 @@
                                 "aws-marketplace:MeterUsage"
                             ],
                             "Resource": "*"
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "s3:GetObject",
+                                "s3:ListObject",
+                                "s3:GetBucket",
+                                "s3:ListBucket",
+                                "s3:PutObject",
+                                "s3:DeleteObject"
+                            ],
+                            "Resource": "*"
                         }
                     ]
                 },
@@ -276,7 +288,9 @@
                                 "s3:Get*",
                                 "iam:List*",
                                 "iam:Get*",
-                                "directconnect:Describe*"
+                                "directconnect:Describe*",
+                                "guardduty:Get*",
+                                "guardduty:List*"
                             ],
                             "Resource": "*"
                         },
@@ -426,18 +440,21 @@
                         {
                             "Effect": "Allow",
                             "Action": [
-                                "sts:AssumeRole"
-                            ],
-                            "Resource": "arn:aws:iam::*"
-                        },
-                        {
-                            "Effect": "Allow",
-                            "Action": [
                                 "iam:PassRole",
                                 "iam:AddRoleToInstanceProfile",
                                 "iam:CreateInstanceProfile",
                                 "iam:DeleteInstanceProfile",
-                                "iam:RemoveRoleFromInstanceProfile"
+                                "iam:RemoveRoleFromInstanceProfile",
+                                "iam:CreateServiceLinkedRole"
+                            ],
+                            "Resource": "*"
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "guardduty:CreateDetector",
+                                "guardduty:DeleteDetector",
+                                "guardduty:UpdateDetector"
                             ],
                             "Resource": "*"
                         }
