@@ -382,6 +382,30 @@
                         {
                             "Effect": "Allow",
                             "Action": [
+                                "ec2:AssociateTransitGatewayRouteTable",
+                                "ec2:AcceptTransitGatewayVpcAttachment",
+                                "ec2:CreateTransitGateway",
+                                "ec2:CreateTransitGatewayRoute",
+                                "ec2:CreateTransitGatewayRouteTable",
+                                "ec2:CreateTransitGatewayVpcAttachment",
+                                "ec2:DeleteTransitGateway",
+                                "ec2:DeleteTransitGatewayRoute",
+                                "ec2:DeleteTransitGatewayRouteTable",
+                                "ec2:DeleteTransitGatewayVpcAttachment",
+                                "ec2:DisableTransitGatewayRouteTablePropagation",
+                                "ec2:DisassociateTransitGatewayRouteTable",
+                                "ec2:EnableTransitGatewayRouteTablePropagation",
+                                "ec2:EnableRoutePropagation",
+                                "ec2:ExportTransitGatewayRoutes",
+                                "ec2:ModifyTransitGatewayVpcAttachment",
+                                "ec2:RejectTransitGatewayVpcAttachment",
+                                "ec2:ReplaceTransitGatewayRoute"
+                            ],
+                            "Resource": "*"
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [
                                 "elasticloadbalancing:ApplySecurityGroupsToLoadBalancer",
                                 "elasticloadbalancing:AttachLoadBalancerToSubnets",
                                 "elasticloadbalancing:ConfigureHealthCheck",
