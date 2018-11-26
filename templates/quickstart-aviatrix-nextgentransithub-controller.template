@@ -277,7 +277,9 @@
                         {
                             "Effect": "Allow",
                             "Action": [
+                                "ec2:Get*",
                                 "ec2:Describe*",
+                                "ec2:Search*",
                                 "elasticloadbalancing:Describe*",
                                 "route53:List*",
                                 "route53:Get*",
@@ -375,7 +377,10 @@
                                 "ec2:CreateVpcPeeringConnection",
                                 "ec2:AcceptVpcPeeringConnection",
                                 "ec2:DeleteVpcPeeringConnection",
-                                "ec2:ModifyInstanceCreditSpecification"
+                                "ec2:ModifyInstanceCreditSpecification",
+                                "ec2:CreateNetworkAclEntry",
+                                "ec2:ReplaceNetworkAclEntry",
+                                "ec2:DeleteNetworkAclEntry"
                             ],
                             "Resource": "*"
                         },
@@ -421,7 +426,8 @@
                                 "elasticloadbalancing:CreateListener",
                                 "elasticloadbalancing:DescribeListeners",
                                 "elasticloadbalancing:DeleteListener",
-                                "elasticloadbalancing:RegisterTargets"
+                                "elasticloadbalancing:RegisterTargets",
+                                "elasticloadbalancing:DeregisterTargets"
                             ],
                             "Resource": "*"
                         },
@@ -437,8 +443,6 @@
                         {
                             "Effect": "Allow",
                             "Action": [
-                                "s3:CreateBucket",
-                                "s3:DeleteBucket",
                                 "s3:PutObject",
                                 "s3:DeleteObject"
                             ],
