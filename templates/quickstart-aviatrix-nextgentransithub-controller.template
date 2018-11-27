@@ -242,18 +242,6 @@
                                 "aws-marketplace:MeterUsage"
                             ],
                             "Resource": "*"
-                        },
-                        {
-                            "Effect": "Allow",
-                            "Action": [
-                                "s3:GetObject",
-                                "s3:ListObject",
-                                "s3:GetBucket",
-                                "s3:ListBucket",
-                                "s3:PutObject",
-                                "s3:DeleteObject"
-                            ],
-                            "Resource": "*"
                         }
                     ]
                 },
@@ -277,7 +265,9 @@
                         {
                             "Effect": "Allow",
                             "Action": [
+                                "ec2:Get*",
                                 "ec2:Describe*",
+                                "ec2:Search*",
                                 "elasticloadbalancing:Describe*",
                                 "route53:List*",
                                 "route53:Get*",
@@ -375,7 +365,34 @@
                                 "ec2:CreateVpcPeeringConnection",
                                 "ec2:AcceptVpcPeeringConnection",
                                 "ec2:DeleteVpcPeeringConnection",
-                                "ec2:ModifyInstanceCreditSpecification"
+                                "ec2:ModifyInstanceCreditSpecification",
+                                "ec2:CreateNetworkAclEntry",
+                                "ec2:ReplaceNetworkAclEntry",
+                                "ec2:DeleteNetworkAclEntry"
+                            ],
+                            "Resource": "*"
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "ec2:AssociateTransitGatewayRouteTable",
+                                "ec2:AcceptTransitGatewayVpcAttachment",
+                                "ec2:CreateTransitGateway",
+                                "ec2:CreateTransitGatewayRoute",
+                                "ec2:CreateTransitGatewayRouteTable",
+                                "ec2:CreateTransitGatewayVpcAttachment",
+                                "ec2:DeleteTransitGateway",
+                                "ec2:DeleteTransitGatewayRoute",
+                                "ec2:DeleteTransitGatewayRouteTable",
+                                "ec2:DeleteTransitGatewayVpcAttachment",
+                                "ec2:DisableTransitGatewayRouteTablePropagation",
+                                "ec2:DisassociateTransitGatewayRouteTable",
+                                "ec2:EnableTransitGatewayRouteTablePropagation",
+                                "ec2:EnableRoutePropagation",
+                                "ec2:ExportTransitGatewayRoutes",
+                                "ec2:ModifyTransitGatewayVpcAttachment",
+                                "ec2:RejectTransitGatewayVpcAttachment",
+                                "ec2:ReplaceTransitGatewayRoute"
                             ],
                             "Resource": "*"
                         },
@@ -397,7 +414,8 @@
                                 "elasticloadbalancing:CreateListener",
                                 "elasticloadbalancing:DescribeListeners",
                                 "elasticloadbalancing:DeleteListener",
-                                "elasticloadbalancing:RegisterTargets"
+                                "elasticloadbalancing:RegisterTargets",
+                                "elasticloadbalancing:DeregisterTargets"
                             ],
                             "Resource": "*"
                         },
@@ -413,8 +431,6 @@
                         {
                             "Effect": "Allow",
                             "Action": [
-                                "s3:CreateBucket",
-                                "s3:DeleteBucket",
                                 "s3:PutObject",
                                 "s3:DeleteObject"
                             ],
