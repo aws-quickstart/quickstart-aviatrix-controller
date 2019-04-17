@@ -2,6 +2,15 @@
     "AWSTemplateFormatVersion": "2010-09-09",
     "Description": "Aviatrix Systems - Creates the necessary policies, roles, security group and launches Aviatrix Controller instance (qs-1o6p25lhf)",
     "Metadata": {
+        "AWSAMIRegionMap":{
+            "Filters":{
+                "AVIATRIXMetered":{
+                    "name":"aviatrix_cloud_services_gateway_*_?etering_?sage-*",
+                    "owner-alias":"aws-marketplace",
+                    "product-code.type":"marketplace"
+                }
+             }
+          },
         "AWS::CloudFormation::Interface": {
             "ParameterGroups": [
                 {
