@@ -24,3 +24,4 @@ tests:
     template_file: quickstart-aviatrix-nextgentransithub-controller-master.template
     regions:
     - us-west-2
+    - us-east-1
