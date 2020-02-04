@@ -110,7 +110,7 @@
         },
         "InstanceTypeParam": {
             "Type": "String",
-            "Default": "t2.large",
+            "Default": "t3.large",
             "AllowedValues": [
                 "t2.large",
                 "t2.xlarge",

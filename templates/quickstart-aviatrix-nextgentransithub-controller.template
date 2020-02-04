@@ -83,7 +83,7 @@
         },
         "InstanceTypeParam": {
             "Type": "String",
-            "Default": "t2.large",
+            "Default": "t3.large",
             "AllowedValues": [
                "t2.large",
                "t2.xlarge",
@@ -116,50 +116,62 @@
             "AMI": {
                 "AVIATRIXMetered": "aviatrix_cloud_services_gateway_043018_metering_usage-9ced0589-99aa-4a89-b134-54ee97f3edee-ami-0e0959b600120857a.4"
             },
+            "ap-east-1": {
+                "AVIATRIXMetered": "ami-011912838bec420cd"
+            },
             "ap-northeast-1": {
-                "AVIATRIXMetered": "ami-048dff200571b34fd"
+                "AVIATRIXMetered": "ami-048dfc6b9a6b78b51"
             },
             "ap-northeast-2": {
-                "AVIATRIXMetered": "ami-0cb08d1ebcce1495f"
+                "AVIATRIXMetered": "ami-047afa71f0e66fd98"
             },
             "ap-south-1": {
-                "AVIATRIXMetered": "ami-09b9ca158a576fa9f"
+                "AVIATRIXMetered": "ami-00a501492d15efd2a"
             },
             "ap-southeast-1": {
-                "AVIATRIXMetered": "ami-02ae4a694e26953b2"
+                "AVIATRIXMetered": "ami-06d99c63ae0c318ac"
             },
             "ap-southeast-2": {
-                "AVIATRIXMetered": "ami-06773bff73422d61d"
+                "AVIATRIXMetered": "ami-086d1a70912834b15"
             },
             "ca-central-1": {
-                "AVIATRIXMetered": "ami-031442f061af55923"
+                "AVIATRIXMetered": "ami-0d752b5104cdbd814"
             },
             "eu-central-1": {
-                "AVIATRIXMetered": "ami-0cf0c16d58a50f19b"
+                "AVIATRIXMetered": "ami-00ae1ee1cdcb97bde"
             },
             "eu-west-1": {
-                "AVIATRIXMetered": "ami-0301c0164e6deb6df"
+                "AVIATRIXMetered": "ami-0b6164a9be512d70b"
             },
             "eu-west-2": {
-                "AVIATRIXMetered": "ami-04b5c38db962b3c13"
+                "AVIATRIXMetered": "ami-0bd8f915015fe2350"
             },
             "eu-west-3": {
-                "AVIATRIXMetered": "ami-0a11977b030622939"
+                "AVIATRIXMetered": "ami-00ec70327ff48ab79"
+            },
+            "eu-north-1": {
+                "AVIATRIXMetered": "ami-0e9f5f029d14cf107"
             },
             "sa-east-1": {
-                "AVIATRIXMetered": "ami-0f23734bcd9d53cd8"
+                "AVIATRIXMetered": "ami-05f858335beb5806d"
             },
             "us-east-1": {
-                "AVIATRIXMetered": "ami-087b5ab4feb053b4b"
+                "AVIATRIXMetered": "ami-00d38fb17ad96f990"
             },
             "us-east-2": {
-                "AVIATRIXMetered": "ami-0bc1db3a5b89c6aef"
+                "AVIATRIXMetered": "ami-0d79c5a2291f2eaf0"
             },
             "us-west-1": {
-                "AVIATRIXMetered": "ami-0a928ae10544ec78e"
+                "AVIATRIXMetered": "ami-0ac232afebae6c77b"
             },
             "us-west-2": {
-                "AVIATRIXMetered": "ami-0f5b26bac60280d69"
+                "AVIATRIXMetered": "ami-0c9f2675d54b40ba7"
+            },
+            "us-gov-east-1": {
+                "AVIATRIXMetered": "ami-6f3edc1e"
+            },
+            "us-gov-west-1": {
+                "AVIATRIXMetered": "ami-e980a188"
             }
         },
         "AMINameMap": {
@@ -292,7 +304,9 @@
                                 "guardduty:Get*",
                                 "guardduty:List*",
                                 "ram:Get*",
-                                "ram:List*"
+                                "ram:List*",
+                                "networkmanager:Get*",
+                                "networkmanager:List*"
                             ],
                             "Resource": "*"
                         },
@@ -357,7 +371,8 @@
                                 "ec2:ExportTransitGatewayRoutes",
                                 "ec2:ModifyTransitGatewayVpcAttachment",
                                 "ec2:RejectTransitGatewayVpcAttachment",
-                                "ec2:ReplaceTransitGatewayRoute"
+                                "ec2:ReplaceTransitGatewayRoute",
+                                "ec2:EnableRoutePropagation"
                             ],
                             "Resource": "*"
                         },
@@ -444,8 +459,10 @@
                                 "route53:ChangeResourceRecordSets",
                                 "ec2:*Volume*",
                                 "ec2:*Snapshot*",
+                                "ec2:*TransitGatewayPeeringAttachment",
                                 "guardduty:*",
-                                "globalaccelerator:*"
+                                "globalaccelerator:*",
+                                "networkmanager:*"
                             ],
                             "Resource": "*"
                         }
