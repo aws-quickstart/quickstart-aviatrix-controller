@@ -110,20 +110,20 @@
         },
         "InstanceTypeParam": {
             "Type": "String",
-            "Default": "t2.large",
+            "Default": "t3.large",
             "AllowedValues": [
-                "t2.medium",
                 "t2.large",
                 "t2.xlarge",
                 "t2.2xlarge",
-                "m4.large",
-                "m4.xlarge",
-                "m4.2xlarge",
-                "m4.4xlarge",
+                "t3.large",
+                "t3.xlarge",
+                "t3.2xlarge",
                 "c4.large",
                 "c4.xlarge",
                 "c4.2xlarge",
-                "c4.4xlarge"
+                "c5.large",
+                "c5.xlarge",
+                "c5.2xlarge"
             ],
             "Description": "Select an instance size for the controller."
         },
