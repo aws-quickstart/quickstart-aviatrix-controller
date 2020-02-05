@@ -116,9 +116,6 @@
             "AMI": {
                 "AVIATRIXMetered": "aviatrix_cloud_services_gateway_043018_metering_usage-9ced0589-99aa-4a89-b134-54ee97f3edee-ami-0e0959b600120857a.4"
             },
-            "ap-east-1": {
-                "AVIATRIXMetered": "ami-011912838bec420cd"
-            },
             "ap-northeast-1": {
                 "AVIATRIXMetered": "ami-048dfc6b9a6b78b51"
             },
