@@ -117,58 +117,58 @@
                 "AVIATRIXMetered": "aviatrix_cloud_services_gateway_043018_metering_usage-9ced0589-99aa-4a89-b134-54ee97f3edee-ami-0e0959b600120857a.4"
             },
             "ap-northeast-1": {
-                "AVIATRIXMetered": "ami-0603e3056d81dbbee"
+                "AVIATRIXMetered": "ami-0753309521b3cf93c"
             },
             "ap-northeast-2": {
-                "AVIATRIXMetered": "ami-0d238e3542de6616a"
+                "AVIATRIXMetered": "ami-03b5e6486f693fe4f"
             },
             "ap-south-1": {
-                "AVIATRIXMetered": "ami-06fa4f5a3c4ab7a69"
+                "AVIATRIXMetered": "ami-0282c5fba757db1a9"
             },
             "ap-southeast-1": {
-                "AVIATRIXMetered": "ami-0fb6fd549ab83ce15"
+                "AVIATRIXMetered": "ami-03504c5cfb9481c48"
             },
             "ap-southeast-2": {
-                "AVIATRIXMetered": "ami-07c05937ef7c91325"
+                "AVIATRIXMetered": "ami-0bdc267f362ab8d97"
             },
             "ca-central-1": {
-                "AVIATRIXMetered": "ami-0c21af0350251901b"
+                "AVIATRIXMetered": "ami-023ebbb416d884192"
             },
             "eu-central-1": {
-                "AVIATRIXMetered": "ami-07642a70ec62e15fb"
+                "AVIATRIXMetered": "ami-095e72639fb95cc04"
             },
             "eu-west-1": {
-                "AVIATRIXMetered": "ami-0dbf817f1ed0638cd"
+                "AVIATRIXMetered": "ami-0d36ea83c80d84db3"
             },
             "eu-west-2": {
-                "AVIATRIXMetered": "ami-05ce526a630fa8042"
+                "AVIATRIXMetered": "ami-05c77ad4e031848e1"
             },
             "eu-west-3": {
-                "AVIATRIXMetered": "ami-06ef2bcf3c15bd580"
+                "AVIATRIXMetered": "ami-0fbeedf430ffc62a1"
             },
             "eu-north-1": {
-                "AVIATRIXMetered": "ami-2274fc5c"
+                "AVIATRIXMetered": "ami-408f043e"
             },
             "sa-east-1": {
-                "AVIATRIXMetered": "ami-0d8cead4f423ceb2f"
+                "AVIATRIXMetered": "ami-028d1f3f661679687"
             },
             "us-east-1": {
-                "AVIATRIXMetered": "ami-0c558f64af58868d9"
+                "AVIATRIXMetered": "ami-048bb7f7223175047"
             },
             "us-east-2": {
-                "AVIATRIXMetered": "ami-0457f4f81db29f339"
+                "AVIATRIXMetered": "ami-0d97bcdd3dfee7cb3"
             },
             "us-west-1": {
-                "AVIATRIXMetered": "ami-0a02a976380b2b2a5"
+                "AVIATRIXMetered": "ami-0aecda673690f0ed5"
             },
             "us-west-2": {
-                "AVIATRIXMetered": "ami-047650e5a66c644d9"
+                "AVIATRIXMetered": "ami-00dc02e24d9ca4610"
             },
             "us-gov-east-1": {
-                "AVIATRIXMetered": "ami-6f3edc1e"
+                "AVIATRIXMetered": "ami-826382f3"
             },
             "us-gov-west-1": {
-                "AVIATRIXMetered": "ami-e980a188"
+                "AVIATRIXMetered": "ami-45226424"
             }
         },
         "AMINameMap": {
