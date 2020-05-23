@@ -78,42 +78,46 @@ Mappings:
   AWSAMIRegionMap:
     AMI:
       AVIATRIXMetered: aviatrix_cloud_services_gateway_043018_metering_usage-9ced0589-99aa-4a89-b134-54ee97f3edee-ami-0e0959b600120857a.4
+    ap-east-1:
+      AVIATRIXMetered: ami-07406019dc8238c2e
     ap-northeast-1:
-      AVIATRIXMetered: ami-0753309521b3cf93c
+      AVIATRIXMetered: ami-0c6dba5df2cc755d5
     ap-northeast-2:
-      AVIATRIXMetered: ami-03b5e6486f693fe4f
+      AVIATRIXMetered: ami-0b8a963d837af2946
     ap-south-1:
-      AVIATRIXMetered: ami-0282c5fba757db1a9
+      AVIATRIXMetered: ami-0045f7b588ebc7b56
     ap-southeast-1:
-      AVIATRIXMetered: ami-03504c5cfb9481c48
+      AVIATRIXMetered: ami-01d96e83e3b07ba97
     ap-southeast-2:
-      AVIATRIXMetered: ami-0bdc267f362ab8d97
+      AVIATRIXMetered: ami-0ffb795b849b5cf95
     ca-central-1:
-      AVIATRIXMetered: ami-023ebbb416d884192
+      AVIATRIXMetered: ami-083924494b6c6ea37
     eu-central-1:
-      AVIATRIXMetered: ami-095e72639fb95cc04
+      AVIATRIXMetered: ami-0788eb16e42dc9be1
     eu-west-1:
-      AVIATRIXMetered: ami-0d36ea83c80d84db3
+      AVIATRIXMetered: ami-02d58cce35f8d0245
     eu-west-2:
-      AVIATRIXMetered: ami-05c77ad4e031848e1
+      AVIATRIXMetered: ami-0aae360f0766e3f6c
     eu-west-3:
-      AVIATRIXMetered: ami-0fbeedf430ffc62a1
+      AVIATRIXMetered: ami-0dada251d09aa6f1b
     eu-north-1:
-      AVIATRIXMetered: ami-408f043e
+      AVIATRIXMetered: ami-02b2a45089a3b9f10
+    me-south-1:
+      AVIATRIXMetered: ami-0782db47aac63b9aa
     sa-east-1:
-      AVIATRIXMetered: ami-028d1f3f661679687
+      AVIATRIXMetered: ami-0b6c5e98dec130218
     us-east-1:
-      AVIATRIXMetered: ami-048bb7f7223175047
+      AVIATRIXMetered: ami-0a81f891b1aac5672
     us-east-2:
-      AVIATRIXMetered: ami-0d97bcdd3dfee7cb3
+      AVIATRIXMetered: ami-0d33395d0bd8ccb13
     us-west-1:
-      AVIATRIXMetered: ami-0aecda673690f0ed5
+      AVIATRIXMetered: ami-076ac0bc01e3441a8
     us-west-2:
-      AVIATRIXMetered: ami-00dc02e24d9ca4610
+      AVIATRIXMetered: ami-05a824a3712ebe6e7
     us-gov-east-1:
-      AVIATRIXMetered: ami-826382f3
+      AVIATRIXMetered: ami-c2c925b3
     us-gov-west-1:
-      AVIATRIXMetered: ami-45226424
+      AVIATRIXMetered: ami-981828f9
   AMINameMap:
     Metered:
       Code: AVIATRIXMetered
