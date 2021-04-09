@@ -1,0 +1,30 @@
+---
+region: us-east-1
+version: 2021-03-15
+resources:
+  - name: qs-aviatrix-1
+    resource_file: s3://aws-quickstart/quickstart-aviatrix-controller/templates/quickstart-aviatrix-nextgentransithub-controller-master.template
+    parameters:
+    - parameter_key: KeyNameParam
+      parameter_value: aws-qs-tc-all
+    - parameter_key: VPCCIDR
+      parameter_value: 10.0.0.0/16
+    - parameter_key: AvailabilityZones
+      parameter_value: us-east-1a, us-east-1b
+    - parameter_key: PublicSubnet1CIDR
+      parameter_value: 10.0.10.0/24
+    - parameter_key: PublicSubnet2CIDR
+      parameter_value: 10.0.20.0/24
+    - parameter_key: InstanceTypeParam
+      parameter_value: t2.large
+    - parameter_key: IAMRoleParam
+      parameter_value: New
+    - parameter_key: QSS3BucketName
+      parameter_value: aws-quickstart
+    deploy_method: stack_set
+    deployment_targets:
+      organizational_units:
+        - Workloads
+    regions:
+      - us-east-1
+
